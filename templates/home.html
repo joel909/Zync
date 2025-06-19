@@ -4,12 +4,28 @@
   <meta charset="UTF-8" />
   <title>Home</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  
   <style>
-    .tab-active {
-      @apply bg-orange-100 text-orange-600 font-semibold;
-    }
-  </style>
+  .tab-button {
+    padding: 0.5rem 1rem; /* py-2 px-4 */
+    border-radius: 0.5rem; /* rounded */
+    background-color: transparent;
+    transition: background-color 0.2s ease-in-out;
+    color: inherit;
+  }
+
+  .tab-button:hover {
+    background-color: #ffb866; /* Richer orange */
+  }
+
+  .tab-active {
+    background-color: #ffb866; /* Same as hover */
+    font-weight: 600;
+  }
+</style>
+
 </head>
+
 <body class="min-h-screen bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 font-sans text-gray-800">
 
   <!-- Header -->
@@ -21,17 +37,17 @@
   </header>
 
   <!-- Floating Tab Bar -->
-  <div class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-white px-4 py-2 rounded-full shadow-md flex space-x-4">
-    <button id="tab-home" onclick="showTab('home')" class="px-3 py-1 rounded transition">Home</button>
-    <button id="tab-upcoming" onclick="showTab('upcoming')" class="px-3 py-1 rounded transition">Upcoming</button>
-    <button id="tab-ongoing" onclick="showTab('ongoing')" class="px-3 py-1 rounded transition">Ongoing</button>
-    <button id="tab-registration" onclick="showTab('registration')" class="px-3 py-1 rounded transition">Registration</button>
+  <div class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-white/70 backdrop-blur-sm px-8 py-3 rounded-xl shadow-md flex space-x-6">
+    <button id="tab-home" onclick="showTab('home')" class="tab-button">Home</button>
+    <button id="tab-upcoming" onclick="showTab('upcoming')" class="tab-button">Upcoming</button>
+    <button id="tab-ongoing" onclick="showTab('ongoing')" class="tab-button">Ongoing</button>
+    <button id="tab-registration" onclick="showTab('registration')" class="tab-button">Registration</button>
   </div>
 
   <!-- Content Section -->
   <main class="pt-36 px-6">
-    <div class="max-w-5xl mx-auto bg-white rounded-xl p-8 shadow transition-all">
-
+    <div class="max-w-7xl mx-auto bg-white/70 backdrop-blur-sm rounded-xl p-12 shadow min-h-[calc(100vh-9rem)] transition-all">
+      
       <!-- Home -->
       <div id="content-home" class="tab-content">
         <h2 class="text-2xl font-bold text-orange-600 mb-4">Welcome 👋</h2>
@@ -67,6 +83,7 @@
           Register Now
         </a>
       </div>
+
     </div>
   </main>
 
@@ -89,5 +106,6 @@
 
     document.addEventListener("DOMContentLoaded", () => showTab('home'));
   </script>
+
 </body>
 </html>
