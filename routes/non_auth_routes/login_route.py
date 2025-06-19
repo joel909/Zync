@@ -1,7 +1,7 @@
 from flask import Blueprint,render_template
 
-blueprint_object = Blueprint("login",__name__)
+login_blueprint = Blueprint("login",__name__)
 
-@blueprint_object.route("/login")
+@login_blueprint.route("/login")
 def login():
     return render_template("login.html")
