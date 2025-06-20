@@ -4,40 +4,42 @@
   <meta charset="UTF-8" />
   <title>Events</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class'
-    }
-  </script>
   <style>
     .tab-button {
       padding: 0.5rem 1rem;
       border-radius: 0.5rem;
       background-color: transparent;
-      transition: background-color 0.2s ease-in-out;
+      transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+      color: #333333;
+      font-weight: 500;
+      cursor: pointer;
+      width: 7rem;  /* uniform width */
+      text-align: center;
     }
 
     .tab-button:hover {
       background-color: #ffb866;
+      color: #fff;
     }
 
     .tab-active {
       background-color: #ffb866;
       font-weight: 600;
+      color: #fff;
     }
 
     .event-tab {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.65rem 1rem;
+      padding: 0.75rem 1rem;
       border-radius: 0.75rem;
       background-color: rgba(255, 255, 255, 0.5);
       transition: background-color 0.2s ease-in-out;
       width: 100%;
-      max-width: 500px;
       font-weight: 500;
       color: inherit;
+      cursor: pointer;
     }
 
     .event-tab:hover {
@@ -57,58 +59,161 @@
       border-radius: 0.5rem;
       font-weight: 500;
       white-space: nowrap;
+      margin-left: 0.5rem;
     }
 
-    .dark .event-status {
-      background-color: #fff6eb;
-      color: #ea580c;
+    /* Manage event button next to each event */
+    .manage-event-btn {
+      background-color: #f97316; /* orange-500 */
+      color: white;
+      border-radius: 0.5rem;
+      padding: 0.25rem 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+      margin-left: 1rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+      height: 2.25rem;
+      display: inline-flex;
+      align-items: center;
     }
 
-    /* Keep same gradient background in dark mode */
+    .manage-event-btn:hover {
+      background-color: #ea580c; /* orange-600 */
+    }
+
+    /* Keep same gradient background */
     .theme-bg {
       background-image: linear-gradient(to bottom right, #facc15, #f97316, #ef4444);
     }
+
+    /* Ongoing events heading */
+    #content-ongoing > .flex {
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    #content-ongoing > .flex > h2 {
+      flex-grow: 1;
+      min-width: 200px;
+    }
+
+    /* Ongoing events list container */
+    #content-ongoing .flex.flex-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    /* Add Event button style */
+    #content-ongoing > .flex > button {
+      white-space: nowrap;
+      height: 2.5rem;
+      align-self: center;
+      flex-shrink: 0;
+      background-color: #f97316; /* orange-500 */
+      color: white;
+      border-radius: 0.5rem;
+      padding: 0 1rem;
+      font-weight: 600;
+      transition: background-color 0.2s ease-in-out;
+      cursor: pointer;
+    }
+
+    #content-ongoing > .flex > button:hover {
+      background-color: #ea580c; /* orange-600 */
+    }
+
+    /* Upcoming events list container */
+    #content-upcoming .flex.flex-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    /* Floating main tabs container */
+    #main-tabs-container {
+      position: fixed;
+      top: 5rem; /* slightly above before */
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(255 255 255 / 0.7);
+      backdrop-filter: blur(10px);
+      padding: 0.75rem 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 10px rgb(0 0 0 / 0.1);
+      display: flex;
+      gap: 1.5rem;
+      z-index: 50;
+      user-select: none;
+    }
+
+    /* Floating logout tab */
+    #logout-tab {
+      position: fixed;
+      top: 5rem;
+      right: 2rem;
+      background-color: rgba(255 255 255 / 0.7);
+      backdrop-filter: blur(10px);
+      padding: 0.75rem 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 10px rgb(0 0 0 / 0.1);
+      z-index: 50;
+      user-select: none;
+    }
+
   </style>
 </head>
 
-<body class="min-h-screen theme-bg font-sans text-gray-800 dark:text-gray-100 transition-colors duration-300">
+<body class="min-h-screen theme-bg font-sans text-gray-800 transition-colors duration-300">
 
   <!-- Header -->
   <header class="p-4 flex justify-between items-center">
     <div class="flex items-center">
       <img src="{{ url_for('static', filename='logo.svg') }}" alt="Logo" class="h-10">
     </div>
-    <div class="flex gap-4 items-center">
-      <!-- Dark Mode Toggle -->
-      <label class="flex items-center cursor-pointer">
-        <input type="checkbox" id="darkModeToggle" class="hidden">
-        <div class="relative w-10 h-5 bg-white/80 rounded-full shadow-inner transition">
-          <div class="dot absolute w-4 h-4 bg-orange-500 rounded-full top-0.5 left-0.5 transition transform"></div>
-        </div>
-      </label>
-      <a href="/login" class="text-white hover:underline font-medium dark:text-gray-100">Logout</a>
-    </div>
+    <div><!-- Removed the old logout text here --></div>
   </header>
 
-  <!-- Floating Tab Bar -->
-  <div class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-white/70 backdrop-blur-sm px-8 py-3 rounded-xl shadow-md flex space-x-6">
-    <button id="tab-upcoming" onclick="showTab('upcoming')" class="tab-button">Upcoming</button>
-    <button id="tab-ongoing" onclick="showTab('ongoing')" class="tab-button">Ongoing</button>
-    <button id="tab-registration" onclick="showTab('registration')" class="tab-button">Registration</button>
+  <!-- Floating main tabs (Upcoming, Ongoing, Registration) -->
+  <div id="main-tabs-container">
+    <button id="tab-upcoming" onclick="showTab('upcoming')" class="tab-button w-28">Upcoming</button>
+    <button id="tab-ongoing" onclick="showTab('ongoing')" class="tab-button w-28">Ongoing</button>
+    <button id="tab-registration" onclick="showTab('registration')" class="tab-button w-28">Registration</button>
+  </div>
+
+  <!-- Floating logout tab -->
+  <div id="logout-tab">
+    <button onclick="location.href='/login'" class="tab-button w-28">
+      Logout
+    </button>
   </div>
 
   <!-- Content Section -->
   <main class="pt-36 px-6">
     <div class="max-w-7xl mx-auto bg-white/70 backdrop-blur-sm rounded-xl p-12 shadow min-h-[calc(100vh-9rem)] transition-all">
-      
+
       <!-- Upcoming Events -->
       <div id="content-upcoming" class="tab-content hidden">
         <h2 class="text-2xl font-bold text-orange-600 mb-4">Upcoming Events</h2>
-        <ul class="space-y-2 text-gray-700 dark:text-gray-200">
-          <li>Hackathon – July 5</li>
-          <li>AI Bootcamp – July 10</li>
-          <li>Guest Talk – July 15</li>
-        </ul>
+        <div class="flex flex-col gap-3">
+          <button onclick="selectEventTab(this)" class="event-tab">
+            Hackathon
+            <span class="event-status">July 5</span>
+          </button>
+
+          <button onclick="selectEventTab(this)" class="event-tab">
+            AI Bootcamp
+            <span class="event-status">July 10</span>
+          </button>
+
+          <button onclick="selectEventTab(this)" class="event-tab">
+            Guest Talk
+            <span class="event-status">July 15</span>
+          </button>
+        </div>
       </div>
 
       <!-- Ongoing Events -->
@@ -121,37 +226,52 @@
         </div>
 
         <div class="flex flex-col gap-3">
-          <button onclick="selectEventTab(this)" class="event-tab">
-            Game Development Jam
-            <span class="event-status">Till June 30</span>
-          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="selectEventTab(this)" class="event-tab flex-grow">
+              Game Development Jam
+              <span class="event-status">Till June 30</span>
+            </button>
+            <button class="manage-event-btn" onclick="alert('Manage Game Development Jam')">Manage Event</button>
+          </div>
 
-          <button onclick="selectEventTab(this)" class="event-tab">
-            Web3 Hack
-            <span class="event-status">Live Now</span>
-          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="selectEventTab(this)" class="event-tab flex-grow">
+              Web3 Hack
+              <span class="event-status">Live Now</span>
+            </button>
+            <button class="manage-event-btn" onclick="alert('Manage Web3 Hack')">Manage Event</button>
+          </div>
 
-          <button onclick="selectEventTab(this)" class="event-tab">
-            Startup Pitch Contest
-            <span class="event-status">Final Round</span>
-          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="selectEventTab(this)" class="event-tab flex-grow">
+              Startup Pitch Contest
+              <span class="event-status">Final Round</span>
+            </button>
+            <button class="manage-event-btn" onclick="alert('Manage Startup Pitch Contest')">Manage Event</button>
+          </div>
 
-          <button onclick="selectEventTab(this)" class="event-tab">
-            Speaking Workshop
-            <span class="event-status">Ends June 25</span>
-          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="selectEventTab(this)" class="event-tab flex-grow">
+              Speaking Workshop
+              <span class="event-status">Ends June 25</span>
+            </button>
+            <button class="manage-event-btn" onclick="alert('Manage Speaking Workshop')">Manage Event</button>
+          </div>
 
-          <button onclick="selectEventTab(this)" class="event-tab">
-            App Design Sprint
-            <span class="event-status">Ongoing</span>
-          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="selectEventTab(this)" class="event-tab flex-grow">
+              App Design Sprint
+              <span class="event-status">Ongoing</span>
+            </button>
+            <button class="manage-event-btn" onclick="alert('Manage App Design Sprint')">Manage Event</button>
+          </div>
         </div>
       </div>
 
       <!-- Registration -->
       <div id="content-registration" class="tab-content hidden">
         <h2 class="text-2xl font-bold text-orange-600 mb-4">Registration</h2>
-        <p class="text-gray-700 dark:text-gray-300 mb-4">
+        <p class="text-gray-700 mb-4">
           Enroll now for upcoming events and secure your spot.
         </p>
         <a href="/register" class="inline-block bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 font-semibold transition">
@@ -166,7 +286,7 @@
     &copy; {{ year }}. All rights reserved.
   </footer>
 
-  <!-- Tab & Dark Mode Script -->
+  <!-- Tab Script -->
   <script>
     function showTab(tab) {
       const tabs = ['upcoming', 'ongoing', 'registration'];
@@ -183,17 +303,6 @@
       allTabs.forEach(tab => tab.classList.remove('event-tab-active'));
       button.classList.add('event-tab-active');
     }
-
-    const toggle = document.getElementById('darkModeToggle');
-    toggle.addEventListener('change', () => {
-      document.documentElement.classList.toggle('dark');
-      const dot = toggle.nextElementSibling.querySelector('.dot');
-      if (document.documentElement.classList.contains('dark')) {
-        dot.style.transform = 'translateX(20px)';
-      } else {
-        dot.style.transform = 'translateX(0)';
-      }
-    });
 
     document.addEventListener("DOMContentLoaded", () => showTab('ongoing'));
   </script>
