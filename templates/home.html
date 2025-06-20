@@ -2,43 +2,96 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Home</title>
+  <title>Events</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    }
+  </script>
   <style>
-  .tab-button {
-    padding: 0.5rem 1rem; /* py-2 px-4 */
-    border-radius: 0.5rem; /* rounded */
-    background-color: transparent;
-    transition: background-color 0.2s ease-in-out;
-    color: inherit;
-  }
+    .tab-button {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      background-color: transparent;
+      transition: background-color 0.2s ease-in-out;
+    }
 
-  .tab-button:hover {
-    background-color: #ffb866; /* Richer orange */
-  }
+    .tab-button:hover {
+      background-color: #ffb866;
+    }
 
-  .tab-active {
-    background-color: #ffb866; /* Same as hover */
-    font-weight: 600;
-  }
-</style>
+    .tab-active {
+      background-color: #ffb866;
+      font-weight: 600;
+    }
 
+    .event-tab {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.65rem 1rem;
+      border-radius: 0.75rem;
+      background-color: rgba(255, 255, 255, 0.5);
+      transition: background-color 0.2s ease-in-out;
+      width: 100%;
+      max-width: 500px;
+      font-weight: 500;
+      color: inherit;
+    }
+
+    .event-tab:hover {
+      background-color: #ffb866;
+    }
+
+    .event-tab.event-tab-active {
+      background-color: #ffb866;
+      font-weight: 600;
+    }
+
+    .event-status {
+      background-color: #fff6eb;
+      color: #ea580c;
+      font-size: 0.85rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .dark .event-status {
+      background-color: #fff6eb;
+      color: #ea580c;
+    }
+
+    /* Keep same gradient background in dark mode */
+    .theme-bg {
+      background-image: linear-gradient(to bottom right, #facc15, #f97316, #ef4444);
+    }
+  </style>
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 font-sans text-gray-800">
+<body class="min-h-screen theme-bg font-sans text-gray-800 dark:text-gray-100 transition-colors duration-300">
 
   <!-- Header -->
   <header class="p-4 flex justify-between items-center">
     <div class="flex items-center">
       <img src="{{ url_for('static', filename='logo.svg') }}" alt="Logo" class="h-10">
     </div>
-    <a href="/login" class="text-white hover:underline font-medium">Logout</a>
+    <div class="flex gap-4 items-center">
+      <!-- Dark Mode Toggle -->
+      <label class="flex items-center cursor-pointer">
+        <input type="checkbox" id="darkModeToggle" class="hidden">
+        <div class="relative w-10 h-5 bg-white/80 rounded-full shadow-inner transition">
+          <div class="dot absolute w-4 h-4 bg-orange-500 rounded-full top-0.5 left-0.5 transition transform"></div>
+        </div>
+      </label>
+      <a href="/login" class="text-white hover:underline font-medium dark:text-gray-100">Logout</a>
+    </div>
   </header>
 
   <!-- Floating Tab Bar -->
   <div class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-white/70 backdrop-blur-sm px-8 py-3 rounded-xl shadow-md flex space-x-6">
-    <button id="tab-home" onclick="showTab('home')" class="tab-button">Home</button>
     <button id="tab-upcoming" onclick="showTab('upcoming')" class="tab-button">Upcoming</button>
     <button id="tab-ongoing" onclick="showTab('ongoing')" class="tab-button">Ongoing</button>
     <button id="tab-registration" onclick="showTab('registration')" class="tab-button">Registration</button>
@@ -48,42 +101,63 @@
   <main class="pt-36 px-6">
     <div class="max-w-7xl mx-auto bg-white/70 backdrop-blur-sm rounded-xl p-12 shadow min-h-[calc(100vh-9rem)] transition-all">
       
-      <!-- Home -->
-      <div id="content-home" class="tab-content">
-        <h2 class="text-2xl font-bold text-orange-600 mb-4">Welcome 👋</h2>
-        <p class="text-gray-700">Select a section above to manage or view your events.</p>
-      </div>
-
       <!-- Upcoming Events -->
       <div id="content-upcoming" class="tab-content hidden">
         <h2 class="text-2xl font-bold text-orange-600 mb-4">Upcoming Events</h2>
-        <ul class="space-y-2 text-gray-700">
-          <li>📅 Hackathon – July 5</li>
-          <li>📅 AI Bootcamp – July 10</li>
-          <li>📅 Guest Talk – July 15</li>
+        <ul class="space-y-2 text-gray-700 dark:text-gray-200">
+          <li>Hackathon – July 5</li>
+          <li>AI Bootcamp – July 10</li>
+          <li>Guest Talk – July 15</li>
         </ul>
       </div>
 
       <!-- Ongoing Events -->
       <div id="content-ongoing" class="tab-content hidden">
-        <h2 class="text-2xl font-bold text-orange-600 mb-4">Ongoing Events</h2>
-        <ul class="space-y-2 text-gray-700">
-          <li>🏃 Design Sprint – Ends June 20</li>
-          <li>💻 Coding Challenge – Live Now</li>
-        </ul>
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-orange-600">Ongoing Events</h2>
+          <button class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 font-semibold transition">
+            + Add Event
+          </button>
+        </div>
+
+        <div class="flex flex-col gap-3">
+          <button onclick="selectEventTab(this)" class="event-tab">
+            Game Development Jam
+            <span class="event-status">Till June 30</span>
+          </button>
+
+          <button onclick="selectEventTab(this)" class="event-tab">
+            Web3 Hack
+            <span class="event-status">Live Now</span>
+          </button>
+
+          <button onclick="selectEventTab(this)" class="event-tab">
+            Startup Pitch Contest
+            <span class="event-status">Final Round</span>
+          </button>
+
+          <button onclick="selectEventTab(this)" class="event-tab">
+            Speaking Workshop
+            <span class="event-status">Ends June 25</span>
+          </button>
+
+          <button onclick="selectEventTab(this)" class="event-tab">
+            App Design Sprint
+            <span class="event-status">Ongoing</span>
+          </button>
+        </div>
       </div>
 
       <!-- Registration -->
       <div id="content-registration" class="tab-content hidden">
         <h2 class="text-2xl font-bold text-orange-600 mb-4">Registration</h2>
-        <p class="text-gray-700 mb-4">
+        <p class="text-gray-700 dark:text-gray-300 mb-4">
           Enroll now for upcoming events and secure your spot.
         </p>
         <a href="/register" class="inline-block bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 font-semibold transition">
           Register Now
         </a>
       </div>
-
     </div>
   </main>
 
@@ -92,10 +166,10 @@
     &copy; {{ year }}. All rights reserved.
   </footer>
 
-  <!-- Tab Script -->
+  <!-- Tab & Dark Mode Script -->
   <script>
     function showTab(tab) {
-      const tabs = ['home', 'upcoming', 'ongoing', 'registration'];
+      const tabs = ['upcoming', 'ongoing', 'registration'];
       tabs.forEach(t => {
         document.getElementById(`content-${t}`).classList.add('hidden');
         document.getElementById(`tab-${t}`).classList.remove('tab-active');
@@ -104,8 +178,24 @@
       document.getElementById(`tab-${tab}`).classList.add('tab-active');
     }
 
-    document.addEventListener("DOMContentLoaded", () => showTab('home'));
-  </script>
+    function selectEventTab(button) {
+      const allTabs = document.querySelectorAll('.event-tab');
+      allTabs.forEach(tab => tab.classList.remove('event-tab-active'));
+      button.classList.add('event-tab-active');
+    }
 
+    const toggle = document.getElementById('darkModeToggle');
+    toggle.addEventListener('change', () => {
+      document.documentElement.classList.toggle('dark');
+      const dot = toggle.nextElementSibling.querySelector('.dot');
+      if (document.documentElement.classList.contains('dark')) {
+        dot.style.transform = 'translateX(20px)';
+      } else {
+        dot.style.transform = 'translateX(0)';
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", () => showTab('ongoing'));
+  </script>
 </body>
 </html>
