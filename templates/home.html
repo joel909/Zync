@@ -5,30 +5,41 @@
   <title>Events</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    body {
+      margin: 0;
+    }
+
     .tab-button {
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
-      background-color: transparent;
-      transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-      color: #333333;
       font-weight: 500;
       cursor: pointer;
-      width: 7rem;  /* uniform width */
-      text-align: center;
+      transition: all 0.2s ease-in-out;
+      background-color: rgba(255 255 255 / 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 0.75rem;
+      padding: 0 1rem;
+      font-size: 1rem;
+      color: #333;
+      display: flex;
+      align-items: center;
+      user-select: none;
+      white-space: nowrap;
+      height: 2.25rem;
+      min-width: 110px;
+      justify-content: center;
     }
 
     .tab-button:hover {
       background-color: #ffb866;
-      color: #fff;
+      color: white;
     }
 
     .tab-active {
-      background-color: #ffb866;
-      font-weight: 600;
-      color: #fff;
+      background-color: #ffb866 !important;
+      color: white !important;
     }
 
-    .event-tab {
+    /* === All Events tab - reverted to original style === */
+    #content-all .event-tab {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -40,14 +51,76 @@
       font-weight: 500;
       color: inherit;
       cursor: pointer;
+      margin-bottom: 0.3rem;
+    }
+
+    #content-all .event-tab:hover {
+      background-color: #ffb866;
+      color: white;
+    }
+
+    #content-all .event-status {
+      background-color: #fff6eb;
+      color: #ea580c;
+      font-size: 0.85rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      white-space: nowrap;
+      margin-left: 0.5rem;
+    }
+
+    /* === Manage Events tab === */
+    #content-manage {
+      /* keep white translucent background from wrapper */
+    }
+
+    .category-block {
+      margin-bottom: 2rem;
+    }
+
+    .category-title {
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: #ea580c;
+      margin-bottom: 0.75rem;
+      border-bottom: 2px solid #f97316;
+      padding-bottom: 0.25rem;
+      user-select: none;
+    }
+
+    .event-tab {
+      display: flex;
+      flex-direction: column;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      background-color: rgba(255, 255, 255, 0.5);
+      transition: background-color 0.2s ease-in-out;
+      width: 100%;
+      font-weight: 500;
+      color: inherit;
+      cursor: pointer;
+      margin-bottom: 0.5rem;
     }
 
     .event-tab:hover {
       background-color: #ffb866;
+      color: white;
     }
 
-    .event-tab.event-tab-active {
-      background-color: #ffb866;
+    .event-main-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .event-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      white-space: nowrap;
       font-weight: 600;
     }
 
@@ -62,249 +135,638 @@
       margin-left: 0.5rem;
     }
 
-    /* Manage event button next to each event */
+    .event-venue {
+      color: #555;
+      font-size: 0.875rem;
+      margin-left: 0.5rem;
+    }
+
     .manage-event-btn {
-      background-color: #f97316; /* orange-500 */
+      background-color: #f97316;
       color: white;
       border-radius: 0.5rem;
       padding: 0.25rem 0.75rem;
       font-weight: 600;
       cursor: pointer;
       transition: background-color 0.2s ease-in-out;
-      margin-left: 1rem;
       white-space: nowrap;
       flex-shrink: 0;
       height: 2.25rem;
       display: inline-flex;
       align-items: center;
+      margin-left: 1rem;
     }
 
     .manage-event-btn:hover {
-      background-color: #ea580c; /* orange-600 */
+      background-color: #ea580c;
     }
 
-    /* Keep same gradient background */
+    /* Dropdown form below each event */
+    .manage-dropdown {
+      background-color: rgba(255 255 255 / 0.85);
+      padding: 1rem;
+      border-radius: 0 0 0.75rem 0.75rem;
+      margin-top: 0.25rem;
+      box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+      animation: fadeInDropdown 0.3s ease forwards;
+    }
+
+    @keyframes fadeInDropdown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .manage-dropdown label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: #ea580c;
+    }
+
+    .manage-dropdown input,
+    .manage-dropdown select {
+      width: 100%;
+      padding: 0.4rem 0.5rem;
+      border: 1px solid #f97316;
+      border-radius: 0.375rem;
+      margin-bottom: 0.75rem;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    .manage-dropdown button {
+      background-color: #f97316;
+      color: white;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .manage-dropdown button:hover {
+      background-color: #ea580c;
+    }
+
     .theme-bg {
       background-image: linear-gradient(to bottom right, #facc15, #f97316, #ef4444);
     }
 
-    /* Ongoing events heading */
-    #content-ongoing > .flex {
-      gap: 1rem;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    #content-ongoing > .flex > h2 {
-      flex-grow: 1;
-      min-width: 200px;
-    }
-
-    /* Ongoing events list container */
-    #content-ongoing .flex.flex-col {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    /* Add Event button style */
-    #content-ongoing > .flex > button {
-      white-space: nowrap;
-      height: 2.5rem;
-      align-self: center;
-      flex-shrink: 0;
-      background-color: #f97316; /* orange-500 */
-      color: white;
-      border-radius: 0.5rem;
-      padding: 0 1rem;
-      font-weight: 600;
-      transition: background-color 0.2s ease-in-out;
-      cursor: pointer;
-    }
-
-    #content-ongoing > .flex > button:hover {
-      background-color: #ea580c; /* orange-600 */
-    }
-
-    /* Upcoming events list container */
-    #content-upcoming .flex.flex-col {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    /* Floating main tabs container */
     #main-tabs-container {
       position: fixed;
-      top: 5rem; /* slightly above before */
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: rgba(255 255 255 / 0.7);
-      backdrop-filter: blur(10px);
-      padding: 0.75rem 2rem;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255 255 255 / 0.75);
+      backdrop-filter: blur(12px);
+      padding: 0.25rem 0.5rem;
       border-radius: 1rem;
-      box-shadow: 0 4px 10px rgb(0 0 0 / 0.1);
+      box-shadow: 0 4px 15px rgb(0 0 0 / 0.12);
       display: flex;
-      gap: 1.5rem;
-      z-index: 50;
+      align-items: center;
+      gap: 0.75rem;
+      z-index: 100;
       user-select: none;
+      min-width: max-content;
     }
 
-    /* Floating logout tab */
-    #logout-tab {
-      position: fixed;
-      top: 5rem;
-      right: 2rem;
-      background-color: rgba(255 255 255 / 0.7);
-      backdrop-filter: blur(10px);
-      padding: 0.75rem 1.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 4px 10px rgb(0 0 0 / 0.1);
-      z-index: 50;
-      user-select: none;
+    #user-icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 0.75rem;
+      background-color: rgba(255 255 255 / 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 1px 6px rgb(0 0 0 / 0.1);
+      transition: background-color 0.2s ease-in-out;
+      position: relative;
+      min-width: 2.25rem;
+      min-height: 2.25rem;
     }
 
+    #user-icon-btn:hover {
+      background-color: #ffb866;
+    }
+
+    #user-icon-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: #f97316;
+      transition: stroke 0.2s ease-in-out;
+    }
+
+    #user-icon-btn:hover svg {
+      stroke: white;
+    }
+
+    #logout-dropdown {
+      position: absolute;
+      top: 48px;
+      right: 0;
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 15px rgb(0 0 0 / 0.15);
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      color: #f97316;
+      cursor: pointer;
+      white-space: nowrap;
+      display: none;
+      user-select: none;
+      min-width: 80px;
+      z-index: 101;
+      transition: opacity 0.2s ease-in-out;
+    }
+
+    #logout-dropdown.show {
+      display: block;
+    }
   </style>
 </head>
 
 <body class="min-h-screen theme-bg font-sans text-gray-800 transition-colors duration-300">
-
-  <!-- Header -->
   <header class="p-4 flex justify-between items-center">
     <div class="flex items-center">
-      <img src="{{ url_for('static', filename='logo.svg') }}" alt="Logo" class="h-10">
+      <img src="{{ url_for('static', filename='logo.svg') }}" alt="Logo" class="h-10" />
     </div>
-    <div><!-- Removed the old logout text here --></div>
+    <div id="main-tabs-container">
+      <button id="tab-manage" onclick="showTab('manage')" class="tab-button">Manage Events</button>
+      <button id="tab-all" onclick="showTab('all')" class="tab-button">All Events</button>
+      <div id="user-icon-btn" tabindex="0" title="User menu">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <div id="logout-dropdown">Logout</div>
+      </div>
+    </div>
   </header>
 
-  <!-- Floating main tabs (Upcoming, Ongoing, Registration) -->
-  <div id="main-tabs-container">
-    <button id="tab-upcoming" onclick="showTab('upcoming')" class="tab-button w-28">Upcoming</button>
-    <button id="tab-ongoing" onclick="showTab('ongoing')" class="tab-button w-28">Ongoing</button>
-    <button id="tab-registration" onclick="showTab('registration')" class="tab-button w-28">Registration</button>
-  </div>
+  <main class="pt-28 px-6">
+    <div
+      class="max-w-7xl mx-auto bg-white/70 backdrop-blur-sm rounded-xl p-12 shadow min-h-[calc(100vh-9rem)] transition-all">
 
-  <!-- Floating logout tab -->
-  <div id="logout-tab">
-    <button onclick="location.href='/login'" class="tab-button w-28">
-      Logout
-    </button>
-  </div>
-
-  <!-- Content Section -->
-  <main class="pt-36 px-6">
-    <div class="max-w-7xl mx-auto bg-white/70 backdrop-blur-sm rounded-xl p-12 shadow min-h-[calc(100vh-9rem)] transition-all">
-
-      <!-- Upcoming Events -->
-      <div id="content-upcoming" class="tab-content hidden">
-        <h2 class="text-2xl font-bold text-orange-600 mb-4">Upcoming Events</h2>
-        <div class="flex flex-col gap-3">
-          <button onclick="selectEventTab(this)" class="event-tab">
-            Hackathon
-            <span class="event-status">July 5</span>
-          </button>
-
-          <button onclick="selectEventTab(this)" class="event-tab">
-            AI Bootcamp
-            <span class="event-status">July 10</span>
-          </button>
-
-          <button onclick="selectEventTab(this)" class="event-tab">
-            Guest Talk
-            <span class="event-status">July 15</span>
-          </button>
+      <!-- All Events -->
+      <div id="content-all" class="tab-content hidden">
+        <h2 class="text-2xl font-bold text-orange-600 mb-4">All Events</h2>
+        <div id="all-events-list" class="flex flex-col gap-3">
+          <!-- original style events -->
+          <div class="event-tab">Hackathon <span class="event-status">July 5</span></div>
+          <div class="event-tab">AI Bootcamp <span class="event-status">July 10</span></div>
+          <div class="event-tab">Guest Talk <span class="event-status">July 15</span></div>
+          <div class="event-tab">Web3 Hack <span class="event-status">Live Now</span></div>
+          <div class="event-tab">Speaking Workshop <span class="event-status">Ends June 25</span></div>
         </div>
       </div>
 
-      <!-- Ongoing Events -->
-      <div id="content-ongoing" class="tab-content hidden">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold text-orange-600">Ongoing Events</h2>
-          <button class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 font-semibold transition">
-            + Add Event
-          </button>
+      <!-- Manage Events -->
+      <div id="content-manage" class="tab-content hidden">
+        <div class="flex justify-between items-center mb-6 gap-3 flex-wrap">
+          <h2 class="text-2xl font-bold text-orange-600 flex-grow">Manage Events</h2>
+          <div class="flex gap-3">
+            <button
+              class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 font-semibold transition"
+              onclick="showTab('add')">+ Add Event</button>
+            <button
+              class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 font-semibold transition"
+              onclick="addCategory()">+ Add Category</button>
+          </div>
         </div>
 
-        <div class="flex flex-col gap-3">
-          <div class="flex items-center gap-2">
-            <button onclick="selectEventTab(this)" class="event-tab flex-grow">
-              Game Development Jam
-              <span class="event-status">Till June 30</span>
-            </button>
-            <button class="manage-event-btn" onclick="alert('Manage Game Development Jam')">Manage Event</button>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <button onclick="selectEventTab(this)" class="event-tab flex-grow">
-              Web3 Hack
-              <span class="event-status">Live Now</span>
-            </button>
-            <button class="manage-event-btn" onclick="alert('Manage Web3 Hack')">Manage Event</button>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <button onclick="selectEventTab(this)" class="event-tab flex-grow">
-              Startup Pitch Contest
-              <span class="event-status">Final Round</span>
-            </button>
-            <button class="manage-event-btn" onclick="alert('Manage Startup Pitch Contest')">Manage Event</button>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <button onclick="selectEventTab(this)" class="event-tab flex-grow">
-              Speaking Workshop
-              <span class="event-status">Ends June 25</span>
-            </button>
-            <button class="manage-event-btn" onclick="alert('Manage Speaking Workshop')">Manage Event</button>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <button onclick="selectEventTab(this)" class="event-tab flex-grow">
-              App Design Sprint
-              <span class="event-status">Ongoing</span>
-            </button>
-            <button class="manage-event-btn" onclick="alert('Manage App Design Sprint')">Manage Event</button>
-          </div>
+        <div id="manage-event-list">
+          <!-- categories and events will be inserted here dynamically -->
         </div>
       </div>
 
-      <!-- Registration -->
-      <div id="content-registration" class="tab-content hidden">
-        <h2 class="text-2xl font-bold text-orange-600 mb-4">Registration</h2>
-        <p class="text-gray-700 mb-4">
-          Enroll now for upcoming events and secure your spot.
-        </p>
-        <a href="/register" class="inline-block bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 font-semibold transition">
-          Register Now
-        </a>
+      <!-- Add Event Form -->
+      <div id="content-add" class="tab-content hidden max-w-md mx-auto">
+        <div class="mb-6 flex justify-between items-center">
+          <h2 class="text-2xl font-bold text-orange-600">Add New Event</h2>
+          <button onclick="showTab('manage')" class="text-orange-500 font-semibold hover:underline">← Back</button>
+        </div>
+        <form id="addEventForm" class="space-y-4" onsubmit="event.preventDefault(); submitEventForm();">
+          <div>
+            <label class="block font-semibold mb-1 text-orange-600" for="eventName">Event Name</label>
+            <input type="text" id="eventName" required class="w-full p-2 border rounded" />
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-orange-600" for="eventDate">Event Date</label>
+            <input type="date" id="eventDate" required class="w-full p-2 border rounded" />
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-orange-600" for="eventVenue">Venue</label>
+            <input type="text" id="eventVenue" required class="w-full p-2 border rounded" />
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-orange-600" for="eventCategory">Category</label>
+            <select id="eventCategory" required class="w-full p-2 border rounded">
+              <!-- options inserted dynamically -->
+            </select>
+          </div>
+          <button type="submit"
+            class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 font-semibold transition">Submit</button>
+        </form>
       </div>
     </div>
   </main>
 
-  <!-- Footer -->
   <footer class="text-center text-sm text-white mt-12 p-4">
     &copy; {{ year }}. All rights reserved.
   </footer>
 
-  <!-- Tab Script -->
   <script>
+    const userIconBtn = document.getElementById('user-icon-btn');
+    const logoutDropdown = document.getElementById('logout-dropdown');
+
+    userIconBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      logoutDropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', () => {
+      logoutDropdown.classList.remove('show');
+    });
+
+    userIconBtn.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        userIconBtn.click();
+      } else if (e.key === 'Escape') {
+        logoutDropdown.classList.remove('show');
+      }
+    });
+
+    logoutDropdown.addEventListener('click', () => {
+      window.location.href = '/login';
+    });
+
+    // Data structures to hold categories and events
+    let categories = [
+      { id: 1, name: 'Cultural' },
+      { id: 2, name: 'Sports' },
+      { id: 3, name: 'Tech' },
+    ];
+
+    // Events have id, name, date, venue, categoryId
+    let events = [
+      { id: 1, name: 'Game Development Jam', date: '2024-06-30', venue: 'Online', categoryId: 3 },
+      { id: 2, name: 'Web3 Hack', date: '', venue: 'Main Hall', categoryId: 3 },
+      { id: 3, name: 'Hackathon', date: '2024-07-05', venue: '', categoryId: 3 },
+      { id: 4, name: 'Football Tournament', date: '2024-06-20', venue: 'Stadium', categoryId: 2 },
+      { id: 5, name: 'Music Fest', date: '2024-06-25', venue: 'Auditorium', categoryId: 1 },
+    ];
+
+    // Unique ID trackers
+    let nextEventId = 6;
+    let nextCategoryId = 4;
+
+    // Format date from yyyy-mm-dd to a readable format like July 5, 2024
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(dateStr);
+      if (isNaN(d)) return dateStr; // fallback if invalid
+      return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    // Render the category options in Add Event select
+    function renderCategoryOptions() {
+      const select = document.getElementById('eventCategory');
+      select.innerHTML = '';
+      categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.id;
+        option.textContent = cat.name;
+        select.appendChild(option);
+      });
+    }
+
+    // Render Manage Events tab content with categories and events grouped
+    function renderManageEvents() {
+      const container = document.getElementById('manage-event-list');
+      container.innerHTML = '';
+
+      if (categories.length === 0) {
+        container.innerHTML = '<p class="text-gray-600">No categories available. Please add a category first.</p>';
+        return;
+      }
+
+      categories.forEach(category => {
+        const catEvents = events.filter(e => e.categoryId === category.id);
+
+        // Category block
+        const catBlock = document.createElement('div');
+        catBlock.className = 'category-block';
+
+        // Category title
+        const catTitle = document.createElement('h3');
+        catTitle.className = 'category-title';
+        catTitle.textContent = category.name;
+        catBlock.appendChild(catTitle);
+
+        if (catEvents.length === 0) {
+          const noEventsText = document.createElement('p');
+          noEventsText.textContent = 'No events in this category.';
+          noEventsText.className = 'text-gray-600 italic ml-2';
+          catBlock.appendChild(noEventsText);
+        } else {
+          catEvents.forEach(eventObj => {
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'event-tab';
+            eventDiv.setAttribute('data-event-id', eventObj.id);
+
+            const mainRow = document.createElement('div');
+            mainRow.className = 'event-main-row';
+
+            // Event info
+            const eventInfo = document.createElement('div');
+            eventInfo.className = 'event-info';
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'event-name';
+            nameSpan.textContent = eventObj.name;
+
+            const dateSpan = document.createElement('span');
+            dateSpan.className = 'event-status';
+            dateSpan.textContent = formatDate(eventObj.date) || 'Date TBA';
+
+            const venueSpan = document.createElement('span');
+            venueSpan.className = 'event-venue';
+            venueSpan.textContent = eventObj.venue ? 'Venue: ' + eventObj.venue : 'Venue: TBA';
+
+            eventInfo.appendChild(nameSpan);
+            eventInfo.appendChild(dateSpan);
+            eventInfo.appendChild(venueSpan);
+
+            mainRow.appendChild(eventInfo);
+
+            // Manage button
+            const manageBtn = document.createElement('button');
+            manageBtn.className = 'manage-event-btn';
+            manageBtn.textContent = 'Manage';
+            manageBtn.onclick = e => toggleManageDropdown(e, eventObj.id);
+            mainRow.appendChild(manageBtn);
+
+            eventDiv.appendChild(mainRow);
+
+            // Dropdown (hidden initially)
+            const dropdown = document.createElement('div');
+            dropdown.className = 'manage-dropdown';
+            dropdown.id = `manage-dropdown-${eventObj.id}`;
+            dropdown.style.display = 'none';
+
+            // Form inside dropdown
+            const form = document.createElement('form');
+            form.onsubmit = evt => {
+              evt.preventDefault();
+              saveEventChanges(eventObj.id);
+            };
+
+            // Name field
+            const labelName = document.createElement('label');
+            labelName.htmlFor = `edit-name-${eventObj.id}`;
+            labelName.textContent = 'Name:';
+            form.appendChild(labelName);
+            const inputName = document.createElement('input');
+            inputName.type = 'text';
+            inputName.id = `edit-name-${eventObj.id}`;
+            inputName.value = eventObj.name;
+            inputName.required = true;
+            form.appendChild(inputName);
+
+            // Date field
+            const labelDate = document.createElement('label');
+            labelDate.htmlFor = `edit-date-${eventObj.id}`;
+            labelDate.textContent = 'Date:';
+            form.appendChild(labelDate);
+            const inputDate = document.createElement('input');
+            inputDate.type = 'date';
+            inputDate.id = `edit-date-${eventObj.id}`;
+            inputDate.value = eventObj.date;
+            inputDate.required = true;
+            form.appendChild(inputDate);
+
+            // Venue field
+            const labelVenue = document.createElement('label');
+            labelVenue.htmlFor = `edit-venue-${eventObj.id}`;
+            labelVenue.textContent = 'Venue:';
+            form.appendChild(labelVenue);
+            const inputVenue = document.createElement('input');
+            inputVenue.type = 'text';
+            inputVenue.id = `edit-venue-${eventObj.id}`;
+            inputVenue.value = eventObj.venue;
+            inputVenue.required = true;
+            form.appendChild(inputVenue);
+
+            // Category field
+            const labelCategory = document.createElement('label');
+            labelCategory.htmlFor = `edit-category-${eventObj.id}`;
+            labelCategory.textContent = 'Category:';
+            form.appendChild(labelCategory);
+            const selectCategory = document.createElement('select');
+            selectCategory.id = `edit-category-${eventObj.id}`;
+            selectCategory.required = true;
+            categories.forEach(cat => {
+              const opt = document.createElement('option');
+              opt.value = cat.id;
+              opt.textContent = cat.name;
+              if (cat.id === eventObj.categoryId) opt.selected = true;
+              selectCategory.appendChild(opt);
+            });
+            form.appendChild(selectCategory);
+
+            // Save button
+            const saveBtn = document.createElement('button');
+            saveBtn.type = 'submit';
+            saveBtn.textContent = 'Save';
+            form.appendChild(saveBtn);
+
+            dropdown.appendChild(form);
+
+            eventDiv.appendChild(dropdown);
+
+            catBlock.appendChild(eventDiv);
+          });
+        }
+
+        container.appendChild(catBlock);
+      });
+    }
+
+    // Render All Events tab with simple list of event names and dates only
+    function renderAllEvents() {
+      const container = document.getElementById('all-events-list');
+      container.innerHTML = '';
+      if (events.length === 0) {
+        container.innerHTML = '<p class="text-gray-600">No events available.</p>';
+        return;
+      }
+
+      // For all events, just list event name + formatted date (original style)
+      events.forEach(eventObj => {
+        const div = document.createElement('div');
+        div.className = 'event-tab';
+
+        div.textContent = eventObj.name + ' ';
+
+        const spanDate = document.createElement('span');
+        spanDate.className = 'event-status';
+        spanDate.textContent = formatDate(eventObj.date) || 'Date TBA';
+
+        div.appendChild(spanDate);
+
+        container.appendChild(div);
+      });
+    }
+
+    // Show tab and hide others
     function showTab(tab) {
-      const tabs = ['upcoming', 'ongoing', 'registration'];
-      tabs.forEach(t => {
+      ['all', 'manage', 'add'].forEach(t => {
         document.getElementById(`content-${t}`).classList.add('hidden');
-        document.getElementById(`tab-${t}`).classList.remove('tab-active');
+        document.getElementById(`tab-${t}`) && document.getElementById(`tab-${t}`).classList.remove('tab-active');
       });
       document.getElementById(`content-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-${tab}`).classList.add('tab-active');
+      const tabBtn = document.getElementById(`tab-${tab}`);
+      if (tabBtn) tabBtn.classList.add('tab-active');
+
+      if (tab === 'add') {
+        renderCategoryOptions();
+      } else if (tab === 'manage') {
+        renderManageEvents();
+      } else if (tab === 'all') {
+        renderAllEvents();
+      }
     }
 
-    function selectEventTab(button) {
-      const allTabs = document.querySelectorAll('.event-tab');
-      allTabs.forEach(tab => tab.classList.remove('event-tab-active'));
-      button.classList.add('event-tab-active');
+    // Add new category prompt
+    function addCategory() {
+      let newCat = prompt('Enter new category name:');
+      if (newCat) {
+        newCat = newCat.trim();
+        if (!newCat) {
+          alert('Category name cannot be empty.');
+          return;
+        }
+        // Check duplicate
+        if (categories.some(c => c.name.toLowerCase() === newCat.toLowerCase())) {
+          alert('Category already exists.');
+          return;
+        }
+        categories.push({ id: nextCategoryId++, name: newCat });
+        alert(`Category "${newCat}" added.`);
+        // Re-render Manage tab categories
+        if (!document.getElementById('content-manage').classList.contains('hidden')) {
+          renderManageEvents();
+        }
+        // Re-render Add Event category dropdown if open
+        if (!document.getElementById('content-add').classList.contains('hidden')) {
+          renderCategoryOptions();
+        }
+      }
     }
 
-    document.addEventListener("DOMContentLoaded", () => showTab('ongoing'));
+    // Submit Add Event form
+    function submitEventForm() {
+      const nameInput = document.getElementById('eventName');
+      const dateInput = document.getElementById('eventDate');
+      const venueInput = document.getElementById('eventVenue');
+      const categorySelect = document.getElementById('eventCategory');
+
+      const name = nameInput.value.trim();
+      const date = dateInput.value;
+      const venue = venueInput.value.trim();
+      const categoryId = Number(categorySelect.value);
+
+      if (!name || !date || !venue || !categoryId) {
+        alert('Please fill all fields.');
+        return;
+      }
+
+      // Add new event to events array
+      events.push({
+        id: nextEventId++,
+        name,
+        date,
+        venue,
+        categoryId,
+      });
+
+      // Reset form
+      document.getElementById('addEventForm').reset();
+
+      // Go back to Manage tab and render updated lists
+      showTab('manage');
+    }
+
+    // Toggle Manage dropdown below event in Manage tab
+    function toggleManageDropdown(e, eventId) {
+      e.stopPropagation();
+
+      // Close all other dropdowns except this one
+      document.querySelectorAll('.manage-dropdown').forEach(d => {
+        if (d.id !== `manage-dropdown-${eventId}`) {
+          d.style.display = 'none';
+        }
+      });
+
+      const dropdown = document.getElementById(`manage-dropdown-${eventId}`);
+      if (!dropdown) return;
+
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // Save edited event changes
+    function saveEventChanges(eventId) {
+      const nameInput = document.getElementById(`edit-name-${eventId}`);
+      const dateInput = document.getElementById(`edit-date-${eventId}`);
+      const venueInput = document.getElementById(`edit-venue-${eventId}`);
+      const categorySelect = document.getElementById(`edit-category-${eventId}`);
+
+      if (!nameInput || !dateInput || !venueInput || !categorySelect) return;
+
+      const newName = nameInput.value.trim();
+      const newDate = dateInput.value;
+      const newVenue = venueInput.value.trim();
+      const newCategoryId = Number(categorySelect.value);
+
+      if (!newName || !newDate || !newVenue || !newCategoryId) {
+        alert('All fields are required.');
+        return;
+      }
+
+      // Update event in array
+      const eventIndex = events.findIndex(e => e.id === eventId);
+      if (eventIndex === -1) return;
+
+      events[eventIndex] = {
+        ...events[eventIndex],
+        name: newName,
+        date: newDate,
+        venue: newVenue,
+        categoryId: newCategoryId,
+      };
+
+      alert('Event updated successfully.');
+
+      // Hide dropdown and re-render Manage tab
+      const dropdown = document.getElementById(`manage-dropdown-${eventId}`);
+      if (dropdown) dropdown.style.display = 'none';
+
+      renderManageEvents();
+    }
+
+    // Initial load
+    document.addEventListener('DOMContentLoaded', () => {
+      showTab('manage');
+    });
+
   </script>
 </body>
 </html>
