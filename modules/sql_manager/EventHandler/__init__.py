@@ -1,18 +1,12 @@
 import string
 import secrets
-from .sign_up import sign_up
-from .sign_in import signin
-class Userhandler():
+from .create_new_event import create_new_event
+class EventHandler():
     def __init__(self,connection,cursor):
         self.connection = connection
         self.cursor = cursor
-    def sign_up(self,email,password,name):
-        k =sign_up(self,email,password,name,"edfouw")
-        return k
-    def sign_in(self,email,password):
-        return signin(self,email,password)
-    def generate_auth_key(self, length=20):
-        return ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(length))
+    def create_new_event(self,core_event,event_name,description,ev_date,venue):
+        return create_new_event(self,core_event,event_name,description,ev_date,venue)
 
 
                

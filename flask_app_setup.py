@@ -5,6 +5,7 @@ from routes.non_auth_routes.signup_route import signup_blueprint
 
 from routes.api.auth_api.login_api import login_api_obj
 from routes.api.auth_api.sign_up_api import signup_api_obj
+from routes.api.event_api.event_api import create_event_api_obj
 
 
 
@@ -20,6 +21,9 @@ def create_app():
 
     #signup-api
     app.register_blueprint(signup_api_obj,url_prefix='/api')
+
+    ##create even API
+    app.register_blueprint(create_event_api_obj,prefix="/api")
     
 
     return app

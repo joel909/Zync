@@ -55,7 +55,7 @@
   const password = document.getElementById("password_box")
   const email = document.getElementById("email_box")
   const name = document.getElementById("name_box")
-  async function requestLogin(email,password,name) {
+  async function requestSignUp(email,password,name) {
       requestData = {email:email,password:password,name:name}
       const request = await fetch("api/signup",{
         method:"POST",
@@ -70,7 +70,8 @@
     
     async function handleSignUp(){
       try{
-        response = await requestLogin(email.value,password.value,name.value)
+        response = await requestSignUp
+    (email.value,password.value,name.value)
         if (response.code == 500){
           throw new Error("user account exists or internal server error")
         }

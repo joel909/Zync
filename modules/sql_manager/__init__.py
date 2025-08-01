@@ -1,5 +1,6 @@
 import mysql.connector
 from .UserHandler import Userhandler
+from .EventHandler import EventHandler
 class SqlManager:
     def __init__(self):
         try:
@@ -10,6 +11,8 @@ class SqlManager:
             print("################### Database Connection FAILED ###############")
     def UserHandler(self):
         return Userhandler(self.conn,self.cursor)
+    def EventHandler(self):
+        return EventHandler(self.conn,self.cursor)
 
     
 
