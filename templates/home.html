@@ -421,7 +421,7 @@
       { id: 2, name: 'Web3 Hack', date: '', venue: 'Main Hall', categoryId: 3 },
       { id: 3, name: 'Hackathon', date: '2024-07-05', venue: '', categoryId: 3 },
       { id: 4, name: 'Football Tournament', date: '2024-06-20', venue: 'Stadium', categoryId: 2 },
-      { id: 5, name: 'Music Fest', date: '2024-06-25', venue: 'Auditorium', categoryId: 1 },
+      { id: 5, name: 'Music         st', date: '2024-06-25', venue: 'Auditorium', categoryId: 1 },
     ];
 
     // Unique ID trackers
@@ -525,6 +525,7 @@
             // Form inside dropdown
             const form = document.createElement('form');
             form.onsubmit = evt => {
+              console.log("hello")
               evt.preventDefault();
               saveEventChanges(eventObj.id);
             };
@@ -766,6 +767,10 @@
     document.addEventListener('DOMContentLoaded', () => {
       showTab('manage');
     });
+
+    function createNewEvent(name,event_date,Venue,category){
+      const request = await fetch("/")
+    }
 
   </script>
 </body>

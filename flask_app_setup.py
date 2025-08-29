@@ -5,7 +5,7 @@ from routes.non_auth_routes.signup_route import signup_blueprint
 
 from routes.api.auth_api.login_api import login_api_obj
 from routes.api.auth_api.sign_up_api import signup_api_obj
-from routes.api.event_api.event_api import create_event_api_obj
+from routes.api.event_api.create_event_api import create_event_api_obj
 
 
 
@@ -15,6 +15,7 @@ def create_app():
     app.register_blueprint(login_blueprint)
     app.register_blueprint(signup_blueprint)
 
+
     #API ROUTES
     #login api
     app.register_blueprint(login_api_obj, url_prefix='/api')
@@ -23,7 +24,9 @@ def create_app():
     app.register_blueprint(signup_api_obj,url_prefix='/api')
 
     ##create even API
-    app.register_blueprint(create_event_api_obj,prefix="/api")
+    app.register_blueprint(create_event_api_obj,url_prefix="/api")
+
+    print("all the registered endpoints are : ",app.url_map)
     
 
     return app

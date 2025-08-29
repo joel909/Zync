@@ -5,8 +5,8 @@ class EventHandler():
     def __init__(self,connection,cursor):
         self.connection = connection
         self.cursor = cursor
-    def create_new_event(self,core_event,event_name,description,ev_date,venue):
-        return create_new_event(self,core_event,event_name,description,ev_date,venue)
+    def create_new_event(self,core_event,event_name,description,ev_date,venue,auth_key):
+        return create_new_event(self,core_event,event_name,description,ev_date,venue,auth_key)
 
 
                
