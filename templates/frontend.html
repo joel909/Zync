@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zync - Event Management</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    }
+
+    .theme-bg {
+      background: linear-gradient(135deg, #facc15 0%, #f97316 50%, #ef4444 100%);
+      min-height: 100vh;
+    }
+
+    /* Tab Navigation Styles */
+    .tab-navigation {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      border-radius: 1rem;
+      padding: 0.25rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 100;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .tab-button {
+      padding: 0.5rem 1rem;
+      border-radius: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #374151;
+      background: transparent;
+      border: none;
+      white-space: nowrap;
+    }
+
+    .tab-button:hover {
+      background: rgba(249, 115, 22, 0.1);
+      color: #f97316;
+    }
+
+    .tab-button.active {
+      background: #f97316;
+      color: white;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+      transform: scale(1.05);
+    }
+
+    .user-menu {
+      position: relative;
+    }
+
+    .user-button {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.75rem;
+      background: #f97316;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      color: white;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+    }
+
+    .user-button:hover {
+      background: #ea580c;
+      transform: scale(1.05);
+    }
+
+    .user-dropdown {
+      position: absolute;
+      top: 3rem;
+      right: 0;
+      background: white;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      padding: 0.5rem;
+      min-width: 120px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.2s ease;
+      z-index: 101;
+    }
+
+    .user-dropdown.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .logout-button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      color: #dc2626;
+      background: transparent;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .logout-button:hover {
+      background: #fef2f2;
+    }
+
+    /* Main Content Styles */
+    .main-content {
+      padding-top: 8rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      padding-bottom: 2rem;
+    }
+
+    .content-container {
+      max-width: 112rem;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      border-radius: 1.5rem;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      min-height: calc(100vh - 12rem);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Tab Content Styles */
+    .tab-content {
+      position: absolute;
+      inset: 0;
+      padding: 2rem;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+    }
+
+    .tab-content.about {
+      opacity: 0;
+      transform: translateX(-100%);
+      pointer-events: none;
+    }
+
+    .tab-content.about.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .tab-content.register {
+      opacity: 0;
+      transform: translateX(100%);
+      pointer-events: none;
+    }
+
+    .tab-content.register.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    /* Event Card Styles */
+    .event-card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .event-card:hover {
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .event-card-header {
+      padding: 1.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .event-card:hover .event-card-header {
+      background: rgba(249, 115, 22, 0.05);
+    }
+
+    .event-card-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+    }
+
+    .event-card.expanded .event-card-content {
+      max-height: 500px;
+      opacity: 1;
+    }
+
+    .event-status {
+      background: #fef3c7;
+      color: #d97706;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .event-status.almost-full {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .event-status.filling-fast {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .event-status.available {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+
+    .chevron-icon {
+      transition: transform 0.2s ease;
+    }
+
+    .event-card.expanded .chevron-icon {
+      transform: rotate(90deg);
+    }
+
+    .register-button {
+      background: linear-gradient(135deg, #f97316, #ef4444);
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .register-button:hover {
+      background: linear-gradient(135deg, #ea580c, #dc2626);
+      box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+      transform: translateY(-1px);
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      padding: 1rem;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      max-width: 28rem;
+      width: 100%;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+      transform: scale(0.9) translateY(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modal-overlay.show .modal-content {
+      transform: scale(1) translateY(0);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      background: white;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #f97316;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .button-secondary {
+      flex: 1;
+      padding: 0.75rem 1.5rem;
+      border: 1px solid #d1d5db;
+      background: white;
+      color: #374151;
+      border-radius: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .button-secondary:hover {
+      background: #f9fafb;
+    }
+
+    .button-primary {
+      flex: 1;
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, #f97316, #ef4444);
+      color: white;
+      border: none;
+      border-radius: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+    }
+
+    .button-primary:hover {
+      background: linear-gradient(135deg, #ea580c, #dc2626);
+      box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+    }
+
+    /* Category Styles */
+    .category-section {
+      margin-bottom: 3rem;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .category-icon {
+      padding: 0.5rem;
+      border-radius: 0.75rem;
+      border: 2px solid;
+    }
+
+    .category-icon.cultural {
+      background: #faf5ff;
+      border-color: #d8b4fe;
+      color: #7c3aed;
+    }
+
+    .category-icon.sports {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      color: #16a34a;
+    }
+
+    .category-icon.tech {
+      background: #eff6ff;
+      border-color: #93c5fd;
+      color: #2563eb;
+    }
+
+    .category-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .category-divider {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, #d1d5db, transparent);
+      margin-left: 1rem;
+    }
+
+    /* About Page Styles */
+    .logo-placeholder {
+      display: inline-block;
+      background: white;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+      transition: all 0.3s ease;
+    }
+
+    .logo-placeholder:hover {
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .logo-container {
+      width: 12rem;
+      height: 12rem;
+      background: linear-gradient(135deg, #fed7aa, #fecaca);
+      border-radius: 1rem;
+      border: 2px dashed #fb923c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .logo-placeholder:hover .logo-container {
+      border-color: #f97316;
+    }
+
+    .info-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .info-card:hover {
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .cta-section {
+      background: linear-gradient(135deg, #f97316, #ef4444);
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: center;
+      color: white;
+    }
+
+    .cta-button {
+      background: white;
+      color: #f97316;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .cta-button:hover {
+      background: #fef7f0;
+      transform: translateX(4px);
+    }
+
+    /* New Styles for Added Features */
+    .search-container {
+      background: white;
+      border-radius: 1rem;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      background: white;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #f97316;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-button {
+      padding: 0.5rem 1rem;
+      border-radius: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      color: #374151;
+    }
+
+    .filter-button:hover, .filter-button.active {
+      background: #f97316;
+      color: white;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: white;
+      border-radius: 0.75rem;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      z-index: 1000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast.success {
+      border-left: 4px solid #10b981;
+    }
+
+    .toast.error {
+      border-left: 4px solid #ef4444;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .required-indicator {
+      color: #ef4444;
+      font-size: 1.2rem;
+    }
+
+    .social-share {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .social-button {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f3f4f6;
+      color: #374151;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .social-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .social-button.facebook:hover { background: #1877f2; color: white; }
+    .social-button.twitter:hover { background: #1da1f2; color: white; }
+    .social-button.linkedin:hover { background: #0a66c2; color: white; }
+    .social-button.whatsapp:hover { background: #25d366; color: white; }
+
+    .faq-item {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 1.5rem 0;
+    }
+
+    .faq-question {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .faq-answer {
+      margin-top: 1rem;
+      color: #4b5563;
+      line-height: 1.6;
+    }
+
+    .contact-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .contact-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    .contact-card:hover {
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+
+    /* NEW: About Page Grid Layout */
+    .about-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .square-card {
+      aspect-ratio: 1 / 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    .wide-card {
+      grid-column: span 2;
+      height: auto;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .tab-navigation {
+        top: 0.5rem;
+        right: 0.5rem;
+        left: 0.5rem;
+        justify-content: center;
+      }
+
+      .main-content {
+        padding-top: 6rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
+
+      .tab-content {
+        padding: 1rem;
+      }
+
+      .content-container {
+        border-radius: 1rem;
+      }
+
+      .modal-content {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+
+      .toast {
+        right: 1rem;
+        left: 1rem;
+        bottom: 1rem;
+      }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .square-card, .wide-card {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+
+<body class="theme-bg">
+  <!-- Header -->
+  <header class="p-4 flex justify-between items-center">
+    <div class="flex items-center">
+      <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-lg">
+        <i data-lucide="calendar" class="w-6 h-6 text-orange-600"></i>
+      </div>
+      <h1 class="ml-3 text-2xl font-bold text-white">Zync</h1>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="tab-navigation">
+      <button id="tab-about" class="tab-button active" onclick="showTab('about')">About</button>
+      <button id="tab-register" class="tab-button" onclick="showTab('register')">Register Now</button>
+      
+      <!-- User Menu -->
+      <div class="user-menu">
+        <button class="user-button" onclick="toggleUserMenu()">
+          <i data-lucide="user" class="w-5 h-5"></i>
+        </button>
+        <div id="user-dropdown" class="user-dropdown">
+          <button class="logout-button" onclick="logout()">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <i data-lucide="check-circle" class="w-6 h-6 text-green-500"></i>
+    <div id="toast-message">Registration successful!</div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="content-container">
+      
+      <!-- About Tab -->
+      <div id="content-about" class="tab-content about active">
+        <div class="mb-8">
+          <h2 class="text-3xl font-bold text-gray-800 mb-2">About Volksfiesta</h2>
+          <p class="text-gray-600">Learn more about Volksfiesta</p>
+        </div>
+        
+        <div class="max-w-4xl mx-auto space-y-8">
+          <!-- Event Logo Placeholder -->
+          <div class="text-center">
+            <div class="logo-placeholder">
+              <div class="logo-container">
+                <div class="text-center">
+                  <i data-lucide="calendar" class="w-16 h-16 text-orange-400 mx-auto mb-3"></i>
+                  <p class="text-orange-600 font-semibold text-lg">Event Logo</p>
+                  <p class="text-orange-500 text-sm">Coming Soon</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NEW: Grid Layout for About Page -->
+          <div class="about-grid">
+            <!-- Event Categories -->
+            <div class="info-card square-card">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 rounded-xl bg-green-50 border-2 border-green-200">
+                  <i data-lucide="trophy" class="w-6 h-6 text-green-600"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800">Event Categories</h3>
+              </div>
+              <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                  <div class="p-1.5 rounded-lg bg-purple-50 border border-purple-200">
+                    <i data-lucide="palette" class="w-4 h-4 text-purple-600"></i>
+                  </div>
+                  <span class="font-medium text-gray-700">Cultural</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="p-1.5 rounded-lg bg-green-50 border border-green-200">
+                    <i data-lucide="trophy" class="w-4 h-4 text-green-600"></i>
+                  </div>
+                  <span class="font-medium text-gray-700">Sports</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="p-1.5 rounded-lg bg-blue-50 border border-blue-200">
+                    <i data-lucide="code" class="w-4 h-4 text-blue-600"></i>
+                  </div>
+                  <span class="font-medium text-gray-700">Tech</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- How It Works -->
+            <div class="info-card square-card">
+              <div> <div class="flex items-center gap-3 mb-4">
+                  <div class="p-2 rounded-xl bg-purple-50 border-2 border-purple-200">
+                    <i data-lucide="calendar" class="w-6 h-6 text-purple-600"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-gray-800">How It Works</h3>
+                </div>
+                <div class="space-y-3 text-gray-600">
+                  <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">1</div>
+                    <p>Browse events by category</p>
+                  </div>
+                  <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">2</div>
+                    <p>Click "Register Now" for events you're interested in</p>
+                  </div>
+                  <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">3</div>
+                    <p>Receive confirmation and event details</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact & Support -->
+            <div class="info-card square-card">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 rounded-xl bg-red-50 border-2 border-red-200">
+                  <i data-lucide="map-pin" class="w-6 h-6 text-red-600"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800">Contact & Support</h3>
+              </div>
+              <div class="space-y-2 text-gray-600">
+                <p>Need help with registration?</p>
+                <p class="font-semibold text-orange-600">support@zync.school</p>
+                <p class="text-sm">We're here to help you make the most of your event experience!</p>
+              </div>
+            </div>
+
+            <!-- Event Organizers -->
+            <div class="info-card square-card">
+              <h3 class="text-xl font-bold text-gray-800 mb-4">Event Organizers</h3>
+              <div class="space-y-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                    <i data-lucide="user" class="w-5 h-5 text-orange-600"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-gray-800">Sarah Johnson</h4>
+                    <p class="text-sm text-gray-600">Cultural Events Coordinator</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <i data-lucide="user" class="w-5 h-5 text-green-600"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-gray-800">Michael Chen</h4>
+                    <p class="text-sm text-gray-600">Tech Events Manager</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="info-card wide-card">
+              <h3 class="text-xl font-bold text-gray-800 mb-4">Frequently Asked Questions</h3>
+              <div class="faq-list">
+                <div class="faq-item">
+                  <div class="faq-question" onclick="toggleFaq(this)">
+                    How do I register for an event?
+                    <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i>
+                  </div>
+                  <div class="faq-answer">
+                    Simply navigate to the "Register Now" tab, browse through the available events, and click on the "Register Now" button for any event you're interested in. Fill out the registration form with your details and submit.
+                  </div>
+                </div>
+                <div class="faq-item">
+                  <div class="faq-question" onclick="toggleFaq(this)">
+                    Can I cancel my registration?
+                    <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i>
+                  </div>
+                  <div class="faq-answer">
+                    Yes, you can cancel your registration up to 48 hours before the event starts. Please contact our support team at support@zync.school to request a cancellation.
+                  </div>
+                </div>
+                <div class="faq-item">
+                  <div class="faq-question" onclick="toggleFaq(this)">
+                    Is there a registration fee?
+                    <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i>
+                  </div>
+                  <div class="faq-answer">
+                    Most events are free for students. However, some special workshops or competitions may have a nominal fee which will be clearly mentioned in the event details.
+                  </div>
+                </div>
+                <div class="faq-item">
+                  <div class="faq-question" onclick="toggleFaq(this)">
+                    How will I receive event updates?
+                    <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i>
+                  </div>
+                  <div class="faq-answer">
+                    After registration, you'll receive a confirmation email with event details. We'll also send reminders and updates via email as the event approaches.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="cta-section wide-card">
+              <h3 class="text-2xl font-bold mb-3">Ready to Get Started?</h3>
+              <p class="mb-6 text-orange-100">Join exciting events and connect with your school community</p>
+              <button class="cta-button" onclick="showTab('register')">
+                Start Registering
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+              
+              <!-- Social Sharing -->
+              <div class="social-share justify-center mt-6">
+                <div class="social-button facebook" onclick="shareEvent('facebook')">
+                  <i data-lucide="facebook" class="w-5 h-5"></i>
+                </div>
+                <div class="social-button twitter" onclick="shareEvent('twitter')">
+                  <i data-lucide="twitter" class="w-5 h-5"></i>
+                </div>
+                <div class="social-button linkedin" onclick="shareEvent('linkedin')">
+                  <i data-lucide="linkedin" class="w-5 h-5"></i>
+                </div>
+                <div class="social-button whatsapp" onclick="shareEvent('whatsapp')">
+                  <i data-lucide="message-circle" class="w-5 h-5"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Register Tab -->
+      <div id="content-register" class="tab-content register">
+        <div class="mb-8">
+          <h2 class="text-3xl font-bold text-gray-800 mb-2">Register for Events</h2>
+          <p class="text-gray-600">Join exciting events and competitions</p>
+        </div>
+        
+        <!-- Search and Filter -->
+        <div class="search-container">
+          <input 
+            type="text" 
+            id="search-input" 
+            class="search-input" 
+            placeholder="Search events by name, description, or venue..."
+            oninput="filterEvents()"
+          />
+          <div class="filter-buttons">
+            <button class="filter-button active" onclick="setFilter('all')">All Events</button>
+            <button class="filter-button" onclick="setFilter('cultural')">Cultural</button>
+            <button class="filter-button" onclick="setFilter('sports')">Sports</button>
+            <button class="filter-button" onclick="setFilter('tech')">Tech</button>
+          </div>
+        </div>
+        
+        <div id="events-container" class="space-y-8">
+          <!-- Events will be populated by JavaScript -->
+        </div>
+
+        <!-- Loading State -->
+        <div id="events-loading" class="text-center py-12 hidden">
+          <div class="inline-block">
+            <div class="loading-spinner"></div>
+          </div>
+          <p class="mt-4 text-gray-600">Loading events...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Registration Modal -->
+  <div id="registration-modal" class="modal-overlay">
+    <div class="modal-content">
+      <h3 class="text-xl font-bold text-gray-800 mb-4">Register for <span id="modal-event-name">Event Name</span></h3>
+      
+      <form id="registration-form" onsubmit="submitRegistration(event)">
+        <div class="space-y-4">
+          <div>
+            <label class="form-label">
+              <span>Full Name</span>
+              <span class="required-indicator">*</span>
+            </label>
+            <input type="text" class="form-input" required />
+          </div>
+          
+          <div>
+            <label class="form-label">
+              <span>Email Address</span>
+              <span class="required-indicator">*</span>
+            </label>
+            <input type="email" class="form-input" required />
+          </div>
+          
+          <div>
+            <label class="form-label">
+              <span>Phone Number</span>
+              <span class="required-indicator">*</span>
+            </label>
+            <input type="tel" class="form-input" required />
+          </div>
+          
+          <div>
+            <label class="form-label">
+              <span>Department</span>
+              <span class="required-indicator">*</span>
+            </label>
+            <select class="form-input" required>
+              <option value="">Select Department</option>
+              <option value="computer-science">Computer Science</option>
+              <option value="engineering">Engineering</option>
+              <option value="business">Business</option>
+              <option value="arts">Arts & Humanities</option>
+              <option value="science">Science</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="form-label">
+              <span>Year of Study</span>
+              <span class="required-indicator">*</span>
+            </label>
+            <select class="form-input" required>
+              <option value="">Select Year</option>
+              <option value="1">1st Year</option>
+              <option value="2">2nd Year</option>
+              <option value="3">3rd Year</option>
+              <option value="4">4th Year</option>
+              <option value="5">5th Year</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="form-label">
+              <span>Additional Notes (Optional)</span>
+            </label>
+            <textarea class="form-input" rows="3" placeholder="Any special requirements or questions..."></textarea>
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button type="button" class="button-secondary" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="button-primary">
+            <span id="submit-text">Register Now</span>
+            <span id="submit-loading" class="hidden">
+              <div class="loading-spinner"></div>
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Tab Navigation
+    function showTab(tabName) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Show selected tab content
+      document.getElementById(`content-${tabName}`).classList.add('active');
+      
+      // Update active tab button
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+      });
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+      
+      // Load events if showing register tab
+      if (tabName === 'register') {
+        loadEvents();
+      }
+    }
+
+    // User Menu
+    function toggleUserMenu() {
+      const dropdown = document.getElementById('user-dropdown');
+      dropdown.classList.toggle('show');
+    }
+
+    // Close user menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const userMenu = document.querySelector('.user-menu');
+      const dropdown = document.getElementById('user-dropdown');
+      
+      if (!userMenu.contains(event.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+    // Logout Function
+    function logout() {
+      showToast('Logged out successfully', 'success');
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 1500);
+    }
+
+    // Toast Notification
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toast-message');
+      
+      toastMessage.textContent = message;
+      toast.className = `toast ${type}`;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // FAQ Toggle
+    function toggleFaq(element) {
+      const answer = element.nextElementSibling;
+      const icon = element.querySelector('i');
+      
+      if (answer.style.maxHeight) {
+        answer.style.maxHeight = null;
+        answer.style.opacity = '0';
+        icon.style.transform = 'rotate(0deg)';
+      } else {
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+        answer.style.opacity = '1';
+        icon.style.transform = 'rotate(180deg)';
+      }
+    }
+
+    // Event Registration Modal
+    let currentEventId = null;
+
+    function openRegistrationModal(eventId, eventName) {
+      currentEventId = eventId;
+      document.getElementById('modal-event-name').textContent = eventName;
+      document.getElementById('registration-modal').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('registration-modal').classList.remove('show');
+      document.getElementById('registration-form').reset();
+    }
+
+    // Submit Registration Form
+    function submitRegistration(event) {
+      event.preventDefault();
+      
+      const submitText = document.getElementById('submit-text');
+      const submitLoading = document.getElementById('submit-loading');
+      
+      // Show loading state
+      submitText.classList.add('hidden');
+      submitLoading.classList.remove('hidden');
+      
+      // Simulate API call
+      setTimeout(() => {
+        // Hide loading state
+        submitText.classList.remove('hidden');
+        submitLoading.classList.add('hidden');
+        
+        // Close modal and show success message
+        closeModal();
+        showToast('Registration successful! You will receive a confirmation email shortly.', 'success');
+      }, 1500);
+    }
+
+    // Event Data
+    const events = [
+      {
+        id: 1,
+        name: "Cultural Dance Competition",
+        description: "Showcase your talent in various dance forms. Solo and group performances are welcome.",
+        category: "cultural",
+        date: "2023-11-15",
+        time: "14:00",
+        venue: "Main Auditorium",
+        capacity: 50,
+        registered: 42,
+        status: "almost-full"
+      },
+      {
+        id: 2,
+        name: "Basketball Tournament",
+        description: "Inter-department basketball championship. Form your teams and compete for the trophy.",
+        category: "sports",
+        date: "2023-11-18",
+        time: "09:00",
+        venue: "Sports Complex",
+        capacity: 100,
+        registered: 65,
+        status: "available"
+      },
+      {
+        id: 3,
+        name: "Coding Hackathon",
+        description: "24-hour coding competition. Solve real-world problems and win exciting prizes.",
+        category: "tech",
+        date: "2023-11-20",
+        time: "10:00",
+        venue: "Computer Lab 3",
+        capacity: 40,
+        registered: 38,
+        status: "filling-fast"
+      },
+      {
+        id: 4,
+        name: "Art Exhibition",
+        description: "Display your artistic creations. All forms of visual art are welcome.",
+        category: "cultural",
+        date: "2023-11-22",
+        time: "11:00",
+        venue: "Art Gallery",
+        capacity: 30,
+        registered: 15,
+        status: "available"
+      },
+      {
+        id: 5,
+        name: "Robotics Workshop",
+        description: "Hands-on workshop on building and programming robots. No prior experience required.",
+        category: "tech",
+        date: "2023-11-25",
+        time: "13:00",
+        venue: "Engineering Building",
+        capacity: 25,
+        registered: 25,
+        status: "almost-full"
+      },
+      {
+        id: 6,
+        name: "Football Championship",
+        description: "Annual inter-college football tournament. Register your team now.",
+        category: "sports",
+        date: "2023-11-28",
+        time: "15:00",
+        venue: "Football Field",
+        capacity: 120,
+        registered: 95,
+        status: "available"
+      }
+    ];
+
+    // Load Events
+    function loadEvents() {
+      const eventsContainer = document.getElementById('events-container');
+      const eventsLoading = document.getElementById('events-loading');
+      
+      // Show loading state
+      eventsContainer.innerHTML = '';
+      eventsLoading.classList.remove('hidden');
+      
+      // Simulate API call delay
+      setTimeout(() => {
+        // Hide loading state
+        eventsLoading.classList.add('hidden');
+        
+        // Group events by category
+        const culturalEvents = events.filter(event => event.category === 'cultural');
+        const sportsEvents = events.filter(event => event.category === 'sports');
+        const techEvents = events.filter(event => event.category === 'tech');
+        
+        // Render events by category
+        if (culturalEvents.length > 0) {
+          renderEventCategory('cultural', 'Cultural Events', culturalEvents, eventsContainer);
+        }
+        
+        if (sportsEvents.length > 0) {
+          renderEventCategory('sports', 'Sports Events', sportsEvents, eventsContainer);
+        }
+        
+        if (techEvents.length > 0) {
+          renderEventCategory('tech', 'Tech Events', techEvents, eventsContainer);
+        }
+      }, 1000);
+    }
+
+    // Render Event Category
+    function renderEventCategory(category, title, events, container) {
+      const categorySection = document.createElement('div');
+      categorySection.className = 'category-section';
+      
+      const categoryHeader = document.createElement('div');
+      categoryHeader.className = 'category-header';
+      
+      // Category icon based on type
+      let iconClass = '';
+      let iconName = '';
+      
+      switch(category) {
+        case 'cultural':
+          iconClass = 'cultural';
+          iconName = 'palette';
+          break;
+        case 'sports':
+          iconClass = 'sports';
+          iconName = 'trophy';
+          break;
+        case 'tech':
+          iconClass = 'tech';
+          iconName = 'code';
+          break;
+      }
+      
+      categoryHeader.innerHTML = `
+        <div class="category-icon ${iconClass}">
+          <i data-lucide="${iconName}" class="w-6 h-6"></i>
+        </div>
+        <h3 class="category-title">${title}</h3>
+        <div class="category-divider"></div>
+      `;
+      
+      categorySection.appendChild(categoryHeader);
+      
+      const eventsGrid = document.createElement('div');
+      eventsGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+      
+      events.forEach(event => {
+        const eventCard = document.createElement('div');
+        eventCard.className = 'event-card';
+        eventCard.innerHTML = `
+          <div class="event-card-header">
+            <div class="flex justify-between items-start mb-3">
+              <h4 class="font-bold text-lg text-gray-800">${event.name}</h4>
+              <span class="event-status ${event.status}">
+                ${event.status === 'almost-full' ? 'Almost Full' : 
+                  event.status === 'filling-fast' ? 'Filling Fast' : 'Available'}
+              </span>
+            </div>
+            <p class="text-gray-600 text-sm mb-4">${event.description}</p>
+            <div class="flex justify-between items-center text-sm text-gray-500">
+              <div class="flex items-center gap-1">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+                <span>${formatDate(event.date)}</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <i data-lucide="clock" class="w-4 h-4"></i>
+                <span>${event.time}</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <i data-lucide="map-pin" class="w-4 h-4"></i>
+                <span>${event.venue}</span>
+              </div>
+            </div>
+          </div>
+          <div class="event-card-content">
+            <div class="p-4 border-t border-gray-100">
+              <div class="flex justify-between items-center mb-4">
+                <span class="text-sm text-gray-600">Registration Progress</span>
+                <span class="text-sm font-medium text-gray-800">${event.registered}/${event.capacity}</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-orange-500 h-2 rounded-full" style="width: ${(event.registered / event.capacity) * 100}%"></div>
+              </div>
+              <button class="register-button mt-4" onclick="openRegistrationModal(${event.id}, '${event.name}')">
+                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                Register Now
+              </button>
+            </div>
+          </div>
+          <div class="p-4 border-t border-gray-100 flex justify-between items-center cursor-pointer" onclick="toggleEventCard(this.parentNode)">
+            <span class="text-sm font-medium text-gray-700">View Details</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 chevron-icon"></i>
+          </div>
+        `;
+        
+        eventsGrid.appendChild(eventCard);
+      });
+      
+      categorySection.appendChild(eventsGrid);
+      container.appendChild(categorySection);
+      
+      // Re-initialize icons for new elements
+      lucide.createIcons();
+    }
+
+    // Toggle Event Card
+    function toggleEventCard(card) {
+      card.classList.toggle('expanded');
+    }
+
+    // Format Date
+    function formatDate(dateString) {
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString(undefined, options);
+    }
+
+    // Filter Events
+    let currentFilter = 'all';
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      
+      // Update active filter button
+      document.querySelectorAll('.filter-button').forEach(button => {
+        button.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      filterEvents();
+    }
+
+    function filterEvents() {
+      const searchTerm = document.getElementById('search-input').value.toLowerCase();
+      
+      // For demo purposes, we'll just reload events with the filter applied
+      // In a real application, you would filter the existing events
+      loadEvents();
+    }
+
+    // Share Event
+    function shareEvent(platform) {
+      const eventUrl = window.location.href;
+      let shareUrl = '';
+      
+      switch(platform) {
+        case 'facebook':
+          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventUrl)}`;
+          break;
+        case 'twitter':
+          shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(eventUrl)}&text=Check out these amazing events!`;
+          break;
+        case 'linkedin':
+          shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(eventUrl)}`;
+          break;
+        case 'whatsapp':
+          shareUrl = `https://wa.me/?text=Check out these amazing events! ${encodeURIComponent(eventUrl)}`;
+          break;
+      }
+      
+      if (shareUrl) {
+        window.open(shareUrl, '_blank', 'width=600,height=400');
+      }
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('registration-modal').addEventListener('click', function(event) {
+      if (event.target === this) {
+        closeModal();
+      }
+    });
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+      loadEvents();
+    });
+  </script>
+</body>
+</html>
