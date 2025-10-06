@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Sign Up</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 min-h-screen flex items-center justify-center font-sans text-gray-800">
   <div class="w-full max-w-md p-8 bg-white rounded-xl shadow-2xl border border-orange-200">
@@ -80,7 +80,7 @@
         const expires = new Date();
         expires.setFullYear(expires.getFullYear() + 10);
         document.cookie = `auth-key=${response.data}; expires=${expires.toUTCString()}; path=/`;
-        window.location.href = "/"
+        window.location.href = "/admin/dashboard"
       }catch(e){
         console.log(`error ${e}`)
         alert(`error ${e}`)

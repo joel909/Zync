@@ -439,13 +439,19 @@
     
     // --- Global State ---
     let events = [];
-    const PREDEFINED_CATEGORIES = ['Sports', 'Cultural', 'Tech'];
+    const PREDEFINED_CATEGORIES = ['sports', 'cultural', 'tech'];
     let nextEventId = 7;
     const todayString = new Date().toISOString().split('T')[0];
 
     // --- API Simulation ---
     async function fetchInitialDataAPI() {
-      const request = await fetch("/event/get",{})
+      const request = await fetch("api/event/get", {});
+      const response = await request.json();  // ✅ Await the JSON parsing
+      // Now you can safely access .data
+      const mockApiData = response.data
+      console.log(mockApiData);
+      return mockApiData
+
         // console.log("--- Simulating GET Request ---");
         // console.log("Endpoint: /api/events");
         // await new Promise(resolve => setTimeout(resolve, 1500)); 

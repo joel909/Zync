@@ -4,4 +4,4 @@ home_blueprint = Blueprint("home",__name__)
 
 @home_blueprint.route("/dashboard")
 def home():
-    return render_template("home.html")
+    return render_template("admin_end/home.html")
