@@ -9,7 +9,7 @@ create_event_api_obj = Blueprint("create_event_api",__name__)
 event_handler_object = SqlManager().EventHandler()
 user_handler_object = SqlManager().UserHandler()
 
-@create_event_api_obj.route("/create/event",methods=["POST"])
+@create_event_api_obj.route("/event/create",methods=["POST"])
 def create_event():
     try:
         core_event = request.get_json()["core_events"]
