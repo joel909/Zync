@@ -4,4 +4,4 @@ signup_blueprint = Blueprint("signup",__name__)
 
 @signup_blueprint.route("/signup")
 def signup():
-    return render_template("signup.html")
+    return render_template("admin_end/signup.html")

@@ -6,14 +6,14 @@ def authenticate_user():
     if request.path not in non_auth_routes:
         is_authenticated = False
         try:
-            user_handler_object = SqlManager().UserHandler()
-            auth_token = request.cookies.get("auth-key")
-            if auth_token:
-                is_authenticated,status,message,email_id = user_handler_object.get_email_id_with_auth_key(auth_key=auth_token)
-                # print("running")
-                print("auth status",is_authenticated,"email",email_id)
-            else:
-                is_authenticated = False
+            with SqlManager().UserHandler() as user_handler_object:
+                auth_token = request.cookies.get("auth-key")
+                if auth_token:
+                    is_authenticated,status,message,email_id = user_handler_object.get_email_id_with_auth_key(auth_key=auth_token)
+                    # print("running")
+                    print("auth status",is_authenticated,"email",email_id)
+                else:
+                    is_authenticated = False
         except Exception as e:
             print("ERROR Occured",e)
             is_authenticated = False

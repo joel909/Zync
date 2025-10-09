@@ -6,23 +6,34 @@ from modules.sql_manager import SqlManager
 from flask import jsonify,make_response
 
 create_event_api_obj = Blueprint("create_event_api",__name__)
-event_handler_object = SqlManager().EventHandler()
+
 user_handler_object = SqlManager().UserHandler()
+'''
+POST REQUEST WITH PARAMETERS
+core_events
+event_name
+description
+ev_date
+venue
+auth_key
+'''
 
 @create_event_api_obj.route("/event/create",methods=["POST"])
 def create_event():
     try:
-        core_event = request.get_json()["core_events"]
-        event_name = request.get_json()["event_name"]
-        description = request.get_json()["description"]
-        ev_date = request.get_json()["ev_date"]
-        venue = request.get_json()["venue"]
-        auth_key = request.get_json()["auth_key"]
-        # email_id = 
-        # if(user_handler_object.get_email_id_with_auth_key(auth_key)[-1]):
+        with SqlManager().EventHandler() as event_handler_object:
+            core_event = request.get_json()["type"]
+            event_name = request.get_json()["name"]
+            description = request.get_json()["description"]
+            ev_date = request.get_json()["date"]
+            venue = request.get_json()["venue"]
+            auth_key = request.cookies.get("auth-key")
+            # email_id = 
+            # if(user_handler_object.get_email_id_with_auth_key(auth_key)[-1]):
     except Exception as e:
         if e=="description" or "core_events" or "event_name" or "ev_date" or "venue":
-            return {"message":f"Invalid Fields Please Enter all fields correctly","code":400},400
+            print("error occured : ",e)
+            return {"message":f"Invalid Fields Please Enter all fields correctly missing field is {e}","code":400},400
     try:
         result,code,message = event_handler_object.create_new_event(core_event,event_name,description,ev_date,venue,auth_key)
         if result:

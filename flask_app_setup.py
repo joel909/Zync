@@ -14,7 +14,7 @@ from routes.api.event_api.display_events_api import display_event_api_obj
 
 
 from routes.middleware.auth import authenticate_user
-from flask import Blueprint, request, g
+from flask import Blueprint, request, g,redirect,url_for    
 
 
 
@@ -24,7 +24,9 @@ def create_app():
     @app.before_request
     def auth_user():
         if authenticate_user() == True:
-            pass
+            if request.path == "/admin/signup":
+                print("redirecting")
+                return redirect("/admin/dashboard")
         else:
             return "Unauthorized please re-login to continue", 401
 

@@ -6,15 +6,16 @@ from flask import jsonify,make_response
 
 signup_api_obj = Blueprint("signup_api",__name__)
 
-user_handler_object = SqlManager().UserHandler()
+
 
 @signup_api_obj.route("/signup",methods=["POST"])
 def signup_api():
-    email = request.get_json()["email"]
-    password = request.get_json()["password"]
-    name = request.get_json()["name"]
-    result,code,message,auth_key = user_handler_object.sign_up(email,password,name)
-    response = create_response(message,code,auth_key)
-    print(response)
-    return response
+    with SqlManager().UserHandler() as user_handler_object:
+        email = request.get_json()["email"]
+        password = request.get_json()["password"]
+        name = request.get_json()["name"]
+        result,code,message,auth_key = user_handler_object.sign_up(email,password,name)
+        response = create_response(message,code,auth_key)
+        print(response)
+        return response
     

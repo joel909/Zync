@@ -471,15 +471,18 @@
     }
     
     async function addEventAPI(eventData) {
-        console.log("--- Simulating POST Request ---");
-        console.log("Endpoint: /api/events");
-        console.log("Method: POST");
         console.log("Payload:", JSON.stringify(eventData, null, 2));
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const newEvent = { ...eventData, id: nextEventId++ };
-        console.log("Response:", newEvent);
-        console.log("--- Simulation End ---");
-        return newEvent;
+        const request  = await fetch("/api/event/create",{
+          method:"POST",
+          headers:{
+            'Content-Type':"application/json"
+          },
+          body:JSON.stringify(eventData, null, 2)
+          
+        })
+        const result = await request.json()
+        console.log("Result : ",result)
+        
     }
 
     // --- Rendering Functions ---
