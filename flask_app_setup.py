@@ -23,10 +23,13 @@ def create_app():
     #middleware 
     @app.before_request
     def auth_user():
-        if authenticate_user() == True:
-            if request.path == "/admin/signup":
-                print("redirecting")
-                return redirect("/admin/dashboard")
+        auth_status = authenticate_user()
+        print("auth status in middleware",auth_status)
+        if auth_status == True:
+            pass
+            # if request.path == "/admin/signup":
+            #     print("redirecting")
+            #     return redirect("/admin/dashboard")
         else:
             return "Unauthorized please re-login to continue", 401
 
@@ -41,16 +44,16 @@ def create_app():
 
     #API ROUTES
     #login api
-    app.register_blueprint(login_api_obj, url_prefix='/api')
+    app.register_blueprint(login_api_obj, url_prefix='/admin/api')
 
     #signup-api
-    app.register_blueprint(signup_api_obj,url_prefix='/api')
+    app.register_blueprint(signup_api_obj,url_prefix='/admin/api')
 
     #get all user related events
     app.register_blueprint(display_event_api_obj,url_prefix='/admin/api')
 
     ##create event API
-    app.register_blueprint(create_event_api_obj,url_prefix="/api")
+    app.register_blueprint(create_event_api_obj,url_prefix="/admin/api")
 
     print("all the registered endpoints are : ",app.url_map)
     

@@ -472,7 +472,7 @@
     
     async function addEventAPI(eventData) {
         console.log("Payload:", JSON.stringify(eventData, null, 2));
-        const request  = await fetch("/api/event/create",{
+        const request  = await fetch("/admin/api/event/create",{
           method:"POST",
           headers:{
             'Content-Type':"application/json"
@@ -483,6 +483,9 @@
         const result = await request.json()
         console.log("Result : ",result)
         
+        // ❌ MISSING RETURN STATEMENT!
+        // Add this line:
+        return result.data || result;
     }
 
     // --- Rendering Functions ---

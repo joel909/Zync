@@ -5,6 +5,9 @@ from .get_email_id import get_email_id_with_auth_key
 from .sign_up import sign_up
 from .sign_in import signin
 class Userhandler():
+    def __enter__(self):
+        # setup code
+        return self
     def __init__(self,connection,cursor):
         self.connection = connection
         self.cursor = cursor
@@ -17,6 +20,9 @@ class Userhandler():
     def sign_up(self,email,password,name):
         k =sign_up(self,email,password,name,Userhandler.generate_auth_key(self))
         return k
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.cursor.close()
+        self.connection.close()
 
 
                

@@ -10,11 +10,11 @@ login_api_obj = Blueprint("login_api",__name__)
 
 @login_api_obj.route("/login",methods=["POST"])
 def login_api():
-    with  SqlManager().UserHandler() as user_handler_object :
-        email = request.get_json()["email"]
-        password = request.get_json()["password"]
-        result,code,message,auth_key = user_handler_object.sign_in(email,password)
-        print("user login hahaha",email)
-        response = create_response(message,code,auth_key)
-        print(response)
-        return response
+    user_handler_object = SqlManager().UserHandler()
+    email = request.get_json()["email"]
+    password = request.get_json()["password"]
+    result,code,message,auth_key = user_handler_object.sign_in(email,password)
+    print("user login hahaha",email)
+    response = create_response(message,code,auth_key)
+    print(response)
+    return response
