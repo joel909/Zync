@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zync - Event Management</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <style>
     body {
@@ -125,7 +125,7 @@
 
     /* Main Content Styles */
     .main-content {
-      padding-top: 8rem;
+      padding-top: 3rem;
       padding-left: 1rem;
       padding-right: 1rem;
       padding-bottom: 2rem;
@@ -139,18 +139,18 @@
       border-radius: 1.5rem;
       box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      min-height: calc(100vh - 12rem);
+      min-height: auto;
+	  margin-top: 0;
       position: relative;
       overflow: hidden;
     }
 
     /* Tab Content Styles */
     .tab-content {
-      position: absolute;
-      inset: 0;
+      position: relative;
       padding: 2rem;
       transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      overflow-y: auto;
+      overflow: visible;
     }
 
     .tab-content.about {
@@ -658,27 +658,6 @@
       transform: translateY(-2px);
     }
 
-    /* NEW: About Page Grid Layout */
-    .about-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .square-card {
-      aspect-ratio: 1 / 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
-    }
-
-    .wide-card {
-      grid-column: span 2;
-      height: auto;
-    }
-
     /* Responsive Design */
     @media (max-width: 768px) {
       .tab-navigation {
@@ -712,14 +691,7 @@
         left: 1rem;
         bottom: 1rem;
       }
-
-      .about-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .square-card, .wide-card {
-        grid-column: span 1;
-      }
+	  
     }
   </style>
 </head>
@@ -767,7 +739,7 @@
       <!-- About Tab -->
       <div id="content-about" class="tab-content about active">
         <div class="mb-8">
-          <h2 class="text-3xl font-bold text-gray-800 mb-2">About Volksfiesta</h2>
+          <h2 class="text-3xl font-bold text-gray-800 mb-2">Volksfiesta</h2>
           <p class="text-gray-600">Learn more about Volksfiesta</p>
         </div>
         
@@ -785,10 +757,21 @@
             </div>
           </div>
 
-          <!-- NEW: Grid Layout for About Page -->
-          <div class="about-grid">
-            <!-- Event Categories -->
-            <div class="info-card square-card">
+          <!-- About Content -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="info-card">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 rounded-xl bg-blue-50 border-2 border-blue-200">
+                  <i data-lucide="users" class="w-6 h-6 text-blue-600"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800">About Volksfiesta</h3>
+              </div>
+              <p class="text-gray-600 leading-relaxed">
+                **Type summary here**
+              </p>
+            </div>
+
+            <div class="info-card">
               <div class="flex items-center gap-3 mb-4">
                 <div class="p-2 rounded-xl bg-green-50 border-2 border-green-200">
                   <i data-lucide="trophy" class="w-6 h-6 text-green-600"></i>
@@ -817,33 +800,30 @@
               </div>
             </div>
 
-            <!-- How It Works -->
-            <div class="info-card square-card">
-              <div> <div class="flex items-center gap-3 mb-4">
-                  <div class="p-2 rounded-xl bg-purple-50 border-2 border-purple-200">
-                    <i data-lucide="calendar" class="w-6 h-6 text-purple-600"></i>
-                  </div>
-                  <h3 class="text-xl font-bold text-gray-800">How It Works</h3>
+            <div class="info-card">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 rounded-xl bg-purple-50 border-2 border-purple-200">
+                  <i data-lucide="calendar" class="w-6 h-6 text-purple-600"></i>
                 </div>
-                <div class="space-y-3 text-gray-600">
-                  <div class="flex items-start gap-3">
-                    <div class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">1</div>
-                    <p>Browse events by category</p>
-                  </div>
-                  <div class="flex items-start gap-3">
-                    <div class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">2</div>
-                    <p>Click "Register Now" for events you're interested in</p>
-                  </div>
-                  <div class="flex items-start gap-3">
-                    <div class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">3</div>
-                    <p>Receive confirmation and event details</p>
-                  </div>
+                <h3 class="text-xl font-bold text-gray-800">How It Works</h3>
+              </div>
+              <div class="space-y-3 text-gray-600">
+                <div class="flex items-start gap-3">
+                  <div class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">1</div>
+                  <p>Browse events by category</p>
+                </div>
+                <div class="flex items-start gap-3">
+                  <div class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">2</div>
+                  <p>Click "Register Now" for events you're interested in</p>
+                </div>
+                <div class="flex items-start gap-3">
+                  <div class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">3</div>
+                  <p>Receive confirmation and event details</p>
                 </div>
               </div>
             </div>
 
-            <!-- Contact & Support -->
-            <div class="info-card square-card">
+            <div class="info-card">
               <div class="flex items-center gap-3 mb-4">
                 <div class="p-2 rounded-xl bg-red-50 border-2 border-red-200">
                   <i data-lucide="map-pin" class="w-6 h-6 text-red-600"></i>
@@ -856,12 +836,57 @@
                 <p class="text-sm">We're here to help you make the most of your event experience!</p>
               </div>
             </div>
+          </div>
 
-            <!-- Event Organizers -->
-            <div class="info-card square-card">
-              <h3 class="text-xl font-bold text-gray-800 mb-4">Event Organizers</h3>
-              <div class="space-y-4">
-                <div class="flex items-center gap-3">
+          <!-- FAQ Section -->
+          <div class="info-card">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Frequently Asked Questions</h3>
+            <div class="faq-list">
+              <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                  How do I register for an event?
+                  <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i>
+                </div>
+                <div class="faq-answer">
+                  Simply navigate to the "Register Now" tab, browse through the available events, and click on the "Register Now" button for any event you're interested in. Fill out the registration form with your details and submit.
+                </div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                  Can I cancel my registration?
+                  <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i>
+                </div>
+                <div class="faq-answer">
+                  Yes, you can cancel your registration up to 48 hours before the event starts. Please contact our support team at support@zync.school to request a cancellation.
+                </div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                  Is there a registration fee?
+                  <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i>
+                </div>
+                <div class="faq-answer">
+                  Most events are free for students. However, some special workshops or competitions may have a nominal fee which will be clearly mentioned in the event details.
+                </div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                  How will I receive event updates?
+                  <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i>
+                </div>
+                <div class="faq-answer">
+                  After registration, you'll receive a confirmation email with event details. We'll also send reminders and updates via email as the event approaches.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Organizer Contact Information -->
+          <div class="info-card">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Event Organizers</h3>
+            <div class="contact-info">
+              <div class="contact-card">
+                <div class="flex items-center gap-3 mb-3">
                   <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
                     <i data-lucide="user" class="w-5 h-5 text-orange-600"></i>
                   </div>
@@ -870,7 +895,20 @@
                     <p class="text-sm text-gray-600">Cultural Events Coordinator</p>
                   </div>
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="space-y-1 text-sm">
+                  <div class="flex items-center gap-2 text-gray-600">
+                    <i data-lucide="mail" class="w-4 h-4"></i>
+                    <span>sarah@zync.school</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-gray-600">
+                    <i data-lucide="phone" class="w-4 h-4"></i>
+                    <span>+1 (555) 123-4567</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="contact-card">
+                <div class="flex items-center gap-3 mb-3">
                   <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                     <i data-lucide="user" class="w-5 h-5 text-green-600"></i>
                   </div>
@@ -879,77 +917,53 @@
                     <p class="text-sm text-gray-600">Tech Events Manager</p>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <!-- FAQ Section -->
-            <div class="info-card wide-card">
-              <h3 class="text-xl font-bold text-gray-800 mb-4">Frequently Asked Questions</h3>
-              <div class="faq-list">
-                <div class="faq-item">
-                  <div class="faq-question" onclick="toggleFaq(this)">
-                    How do I register for an event?
-                    <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i>
+                <div class="space-y-1 text-sm">
+                  <div class="flex items-center gap-2 text-gray-600">
+                    <i data-lucide="mail" class="w-4 h-4"></i>
+                    <span>michael@zync.school</span>
                   </div>
-                  <div class="faq-answer">
-                    Simply navigate to the "Register Now" tab, browse through the available events, and click on the "Register Now" button for any event you're interested in. Fill out the registration form with your details and submit.
-                  </div>
-                </div>
-                <div class="faq-item">
-                  <div class="faq-question" onclick="toggleFaq(this)">
-                    Can I cancel my registration?
-                    <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i>
-                  </div>
-                  <div class="faq-answer">
-                    Yes, you can cancel your registration up to 48 hours before the event starts. Please contact our support team at support@zync.school to request a cancellation.
-                  </div>
-                </div>
-                <div class="faq-item">
-                  <div class="faq-question" onclick="toggleFaq(this)">
-                    Is there a registration fee?
-                    <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i>
-                  </div>
-                  <div class="faq-answer">
-                    Most events are free for students. However, some special workshops or competitions may have a nominal fee which will be clearly mentioned in the event details.
-                  </div>
-                </div>
-                <div class="faq-item">
-                  <div class="faq-question" onclick="toggleFaq(this)">
-                    How will I receive event updates?
-                    <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i>
-                  </div>
-                  <div class="faq-answer">
-                    After registration, you'll receive a confirmation email with event details. We'll also send reminders and updates via email as the event approaches.
+                  <div class="flex items-center gap-2 text-gray-600">
+                    <i data-lucide="phone" class="w-4 h-4"></i>
+                    <span>+1 (555) 987-6543</span>
                   </div>
                 </div>
               </div>
-            </div>
-
-            <!-- Call to Action -->
-            <div class="cta-section wide-card">
-              <h3 class="text-2xl font-bold mb-3">Ready to Get Started?</h3>
-              <p class="mb-6 text-orange-100">Join exciting events and connect with your school community</p>
-              <button class="cta-button" onclick="showTab('register')">
-                Start Registering
-                <i data-lucide="chevron-right" class="w-4 h-4"></i>
-              </button>
               
-              <!-- Social Sharing -->
-              <div class="social-share justify-center mt-6">
-                <div class="social-button facebook" onclick="shareEvent('facebook')">
-                  <i data-lucide="facebook" class="w-5 h-5"></i>
+              <div class="contact-card">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <i data-lucide="user" class="w-5 h-5 text-blue-600"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-gray-800">Emily Rodriguez</h4>
+                    <p class="text-sm text-gray-600">Sports Events Director</p>
+                  </div>
                 </div>
-                <div class="social-button twitter" onclick="shareEvent('twitter')">
-                  <i data-lucide="twitter" class="w-5 h-5"></i>
-                </div>
-                <div class="social-button linkedin" onclick="shareEvent('linkedin')">
-                  <i data-lucide="linkedin" class="w-5 h-5"></i>
-                </div>
-                <div class="social-button whatsapp" onclick="shareEvent('whatsapp')">
-                  <i data-lucide="message-circle" class="w-5 h-5"></i>
+                <div class="space-y-1 text-sm">
+                  <div class="flex items-center gap-2 text-gray-600">
+                    <i data-lucide="mail" class="w-4 h-4"></i>
+                    <span>emily@zync.school</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-gray-600">
+                    <i data-lucide="phone" class="w-4 h-4"></i>
+                    <span>+1 (555) 456-7890</span>
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
+
+          <!-- Call to Action -->
+          <div class="cta-section">
+            <h3 class="text-2xl font-bold mb-3">Ready to Get Started?</h3>
+            <p class="mb-6 text-orange-100">Join exciting events and connect with your school community</p>
+            <button class="cta-button" onclick="showTab('register')">
+              Start Registering
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+            
+            <!-- Social Sharing -->
+            
           </div>
         </div>
       </div>
@@ -984,10 +998,17 @@
 
         <!-- Loading State -->
         <div id="events-loading" class="text-center py-12 hidden">
-          <div class="inline-block">
-            <div class="loading-spinner"></div>
+          <div class="inline-flex items-center justify-center gap-3">
+            <div class="w-6 h-6 border-2 border-t-orange-600 border-r-orange-400 border-b-orange-300 border-l-orange-500 rounded-full animate-spin"></div>
+            <span class="text-gray-600">Loading events...</span>
           </div>
-          <p class="mt-4 text-gray-600">Loading events...</p>
+        </div>
+
+        <!-- No Results Message -->
+        <div id="no-events-message" class="text-center py-12 hidden">
+          <i data-lucide="calendar-x" class="w-16 h-16 text-gray-300 mx-auto mb-4"></i>
+          <h3 class="text-xl font-semibold text-gray-600 mb-2">No events found</h3>
+          <p class="text-gray-500">Try adjusting your search or filter criteria</p>
         </div>
       </div>
     </div>
@@ -996,136 +1017,216 @@
   <!-- Registration Modal -->
   <div id="registration-modal" class="modal-overlay">
     <div class="modal-content">
-      <h3 class="text-xl font-bold text-gray-800 mb-4">Register for <span id="modal-event-name">Event Name</span></h3>
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="calendar" class="w-8 h-8 text-orange-600"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-800 mb-2">Register for Event</h3>
+        <p id="modal-event-name" class="text-gray-600"></p>
+      </div>
       
-      <form id="registration-form" onsubmit="submitRegistration(event)">
+      <form id="registration-form">
         <div class="space-y-4">
           <div>
-            <label class="form-label">
+            <label for="student-name" class="form-label">
               <span>Full Name</span>
               <span class="required-indicator">*</span>
             </label>
-            <input type="text" class="form-input" required />
+            <input
+              type="text"
+              id="student-name"
+              name="name"
+              required
+              class="form-input"
+              placeholder="Enter your full name"
+            />
           </div>
           
           <div>
-            <label class="form-label">
+            <label for="student-email" class="form-label">
               <span>Email Address</span>
               <span class="required-indicator">*</span>
             </label>
-            <input type="email" class="form-input" required />
+            <input
+              type="email"
+              id="student-email"
+              name="email"
+              required
+              class="form-input"
+              placeholder="Enter your email address"
+            />
           </div>
           
           <div>
-            <label class="form-label">
+            <label for="student-school" class="form-label">
+              <span>School</span>
+              <span class="required-indicator">*</span>
+            </label>
+            <input
+              type="text"
+              id="student-school"
+              name="school"
+              required
+              class="form-input"
+              placeholder="Enter your school name"
+            />
+          </div>
+
+          <div>
+            <label for="student-phone" class="form-label">
               <span>Phone Number</span>
-              <span class="required-indicator">*</span>
             </label>
-            <input type="tel" class="form-input" required />
-          </div>
-          
-          <div>
-            <label class="form-label">
-              <span>Department</span>
-              <span class="required-indicator">*</span>
-            </label>
-            <select class="form-input" required>
-              <option value="">Select Department</option>
-              <option value="computer-science">Computer Science</option>
-              <option value="engineering">Engineering</option>
-              <option value="business">Business</option>
-              <option value="arts">Arts & Humanities</option>
-              <option value="science">Science</option>
-            </select>
-          </div>
-          
-          <div>
-            <label class="form-label">
-              <span>Year of Study</span>
-              <span class="required-indicator">*</span>
-            </label>
-            <select class="form-input" required>
-              <option value="">Select Year</option>
-              <option value="1">1st Year</option>
-              <option value="2">2nd Year</option>
-              <option value="3">3rd Year</option>
-              <option value="4">4th Year</option>
-              <option value="5">5th Year</option>
-            </select>
-          </div>
-          
-          <div>
-            <label class="form-label">
-              <span>Additional Notes (Optional)</span>
-            </label>
-            <textarea class="form-input" rows="3" placeholder="Any special requirements or questions..."></textarea>
+            <input
+              type="tel"
+              id="student-phone"
+              name="phone"
+              class="form-input"
+              placeholder="Enter your phone number (optional)"
+            />
           </div>
         </div>
         
         <div class="button-group">
-          <button type="button" class="button-secondary" onclick="closeModal()">Cancel</button>
-          <button type="submit" class="button-primary">
-            <span id="submit-text">Register Now</span>
-            <span id="submit-loading" class="hidden">
-              <div class="loading-spinner"></div>
-            </span>
+          <button type="button" class="button-secondary" onclick="closeModal()">
+            Cancel
+          </button>
+          <button type="submit" class="button-primary" id="submit-button">
+            Register
           </button>
         </div>
       </form>
     </div>
   </div>
 
+  <!-- Footer -->
+  <footer class="text-center text-white/80 py-4">
+    <p>&copy; 2025 Zync. All rights reserved.</p>
+  </footer>
+
   <script>
     // Initialize Lucide icons
     lucide.createIcons();
 
-    // Tab Navigation
-    function showTab(tabName) {
-      // Hide all tab contents
-      document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
+    // Data
+    const categories = [
+      { 
+        id: 1, 
+        name: 'Cultural', 
+        icon: 'palette', 
+        color: 'text-purple-600',
+        bgColor: 'bg-purple-50 border-purple-200',
+        iconClass: 'cultural'
+      },
+      { 
+        id: 2, 
+        name: 'Sports', 
+        icon: 'trophy', 
+        color: 'text-green-600',
+        bgColor: 'bg-green-50 border-green-200',
+        iconClass: 'sports'
+      },
+      { 
+        id: 3, 
+        name: 'Tech', 
+        icon: 'code', 
+        color: 'text-blue-600',
+        bgColor: 'bg-blue-50 border-blue-200',
+        iconClass: 'tech'
+      },
+    ];
+
+    const events = [
+      { 
+        id: 1, 
+        name: 'Game Development Jam', 
+        date: '2024-06-30', 
+        venue: 'Online', 
+        categoryId: 3,
+        description: '48-hour game development competition',
+        maxParticipants: 100,
+        currentParticipants: 67
+      },
+      { 
+        id: 2, 
+        name: 'Web3 Hackathon', 
+        date: '2024-07-15', 
+        venue: 'Main Hall', 
+        categoryId: 3,
+        description: 'Build the future of decentralized applications',
+        maxParticipants: 80,
+        currentParticipants: 23
+      },
+      { 
+        id: 3, 
+        name: 'AI Innovation Challenge', 
+        date: '2024-07-05', 
+        venue: 'Tech Center', 
+        categoryId: 3,
+        description: 'Explore the possibilities of artificial intelligence',
+        maxParticipants: 60,
+        currentParticipants: 45
+      },
+      { 
+        id: 4, 
+        name: 'Football Tournament', 
+        date: '2024-06-20', 
+        venue: 'Stadium', 
+        categoryId: 2,
+        description: 'Inter-college football championship',
+        maxParticipants: 200,
+        currentParticipants: 156
+      },
+      { 
+        id: 5, 
+        name: 'Music Festival', 
+        date: '2024-06-25', 
+        venue: 'Auditorium', 
+        categoryId: 1,
+        description: 'Celebrate music and arts with performances',
+        maxParticipants: 300,
+        currentParticipants: 234
+      },
+      { 
+        id: 6, 
+        name: 'Cultural Dance Competition', 
+        date: '2024-07-10', 
+        venue: 'Main Stage', 
+        categoryId: 1,
+        description: 'Showcase traditional and modern dance forms',
+        maxParticipants: 150,
+        currentParticipants: 89
+      },
+    ];
+
+    let expandedEvent = null;
+    let selectedEvent = null;
+    let currentFilter = 'all';
+    let searchQuery = '';
+
+    // Utility functions
+    function formatDate(dateStr) {
+      if (!dateStr) return 'Date TBA';
+      const date = new Date(dateStr);
+      return isNaN(date.getTime()) ? dateStr : date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
       });
-      
-      // Show selected tab content
-      document.getElementById(`content-${tabName}`).classList.add('active');
-      
-      // Update active tab button
-      document.querySelectorAll('.tab-button').forEach(button => {
-        button.classList.remove('active');
-      });
-      document.getElementById(`tab-${tabName}`).classList.add('active');
-      
-      // Load events if showing register tab
-      if (tabName === 'register') {
-        loadEvents();
-      }
     }
 
-    // User Menu
-    function toggleUserMenu() {
-      const dropdown = document.getElementById('user-dropdown');
-      dropdown.classList.toggle('show');
+    function getCategoryById(id) {
+      return categories.find(cat => cat.id === id);
     }
 
-    // Close user menu when clicking outside
-    document.addEventListener('click', function(event) {
-      const userMenu = document.querySelector('.user-menu');
-      const dropdown = document.getElementById('user-dropdown');
-      
-      if (!userMenu.contains(event.target)) {
-        dropdown.classList.remove('show');
-      }
-    });
-
-    // Logout Function
-    function logout() {
-      showToast('Logged out successfully', 'success');
-      setTimeout(() => {
-        window.location.href = 'login.html';
-      }, 1500);
+    function getAvailabilityStatus(current = 0, max = 0) {
+      if (max === 0) return { text: 'Open', className: 'available' };
+      const percentage = (current / max) * 100;
+      if (percentage >= 90) return { text: 'Almost Full', className: 'almost-full' };
+      if (percentage >= 70) return { text: 'Filling Fast', className: 'filling-fast' };
+      return { text: 'Available', className: 'available' };
     }
 
-    // Toast Notification
+    // Toast notification
     function showToast(message, type = 'success') {
       const toast = document.getElementById('toast');
       const toastMessage = document.getElementById('toast-message');
@@ -1134,342 +1235,373 @@
       toast.className = `toast ${type}`;
       toast.classList.add('show');
       
+      // Update icon based on type
+      const icon = toast.querySelector('i');
+      if (type === 'success') {
+        icon.setAttribute('data-lucide', 'check-circle');
+        icon.className = 'w-6 h-6 text-green-500';
+      } else {
+        icon.setAttribute('data-lucide', 'x-circle');
+        icon.className = 'w-6 h-6 text-red-500';
+      }
+      lucide.createIcons();
+      
+      // Hide after 3 seconds
       setTimeout(() => {
         toast.classList.remove('show');
       }, 3000);
     }
 
-    // FAQ Toggle
+    // Tab management
+    function showTab(tab) {
+      // Update tab buttons
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`tab-${tab}`).classList.add('active');
+
+      // Update tab content
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.getElementById(`content-${tab}`).classList.add('active');
+
+      if (tab === 'register') {
+        renderEvents();
+      }
+    }
+
+    // User menu
+    function toggleUserMenu() {
+      const dropdown = document.getElementById('user-dropdown');
+      dropdown.classList.toggle('show');
+    }
+
+    function logout() {
+      alert('Logging out...');
+    }
+
+    // Close user menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.user-menu')) {
+        document.getElementById('user-dropdown').classList.remove('show');
+      }
+    });
+
+    // FAQ toggle
     function toggleFaq(element) {
       const answer = element.nextElementSibling;
       const icon = element.querySelector('i');
       
       if (answer.style.maxHeight) {
         answer.style.maxHeight = null;
-        answer.style.opacity = '0';
         icon.style.transform = 'rotate(0deg)';
       } else {
         answer.style.maxHeight = answer.scrollHeight + 'px';
-        answer.style.opacity = '1';
         icon.style.transform = 'rotate(180deg)';
       }
     }
 
-    // Event Registration Modal
-    let currentEventId = null;
+    // Event management
+    function toggleEventExpansion(eventId) {
+      const eventCard = document.getElementById(`event-${eventId}`);
+      
+      if (expandedEvent === eventId) {
+        eventCard.classList.remove('expanded');
+        expandedEvent = null;
+      } else {
+        // Close previously expanded event
+        if (expandedEvent) {
+          document.getElementById(`event-${expandedEvent}`).classList.remove('expanded');
+        }
+        
+        eventCard.classList.add('expanded');
+        expandedEvent = eventId;
+      }
+    }
 
-    function openRegistrationModal(eventId, eventName) {
-      currentEventId = eventId;
-      document.getElementById('modal-event-name').textContent = eventName;
-      document.getElementById('registration-modal').classList.add('show');
+    function openRegistrationModal(eventId) {
+      selectedEvent = events.find(e => e.id === eventId);
+      if (selectedEvent) {
+        document.getElementById('modal-event-name').textContent = selectedEvent.name;
+        document.getElementById('registration-modal').classList.add('show');
+      }
     }
 
     function closeModal() {
       document.getElementById('registration-modal').classList.remove('show');
       document.getElementById('registration-form').reset();
+      selectedEvent = null;
     }
 
-    // Submit Registration Form
-    function submitRegistration(event) {
-      event.preventDefault();
-      
-      const submitText = document.getElementById('submit-text');
-      const submitLoading = document.getElementById('submit-loading');
-      
-      // Show loading state
-      submitText.classList.add('hidden');
-      submitLoading.classList.remove('hidden');
-      
-      // Simulate API call
-      setTimeout(() => {
-        // Hide loading state
-        submitText.classList.remove('hidden');
-        submitLoading.classList.add('hidden');
-        
-        // Close modal and show success message
-        closeModal();
-        showToast('Registration successful! You will receive a confirmation email shortly.', 'success');
-      }, 1500);
-    }
-
-    // Event Data
-    const events = [
-      {
-        id: 1,
-        name: "Cultural Dance Competition",
-        description: "Showcase your talent in various dance forms. Solo and group performances are welcome.",
-        category: "cultural",
-        date: "2023-11-15",
-        time: "14:00",
-        venue: "Main Auditorium",
-        capacity: 50,
-        registered: 42,
-        status: "almost-full"
-      },
-      {
-        id: 2,
-        name: "Basketball Tournament",
-        description: "Inter-department basketball championship. Form your teams and compete for the trophy.",
-        category: "sports",
-        date: "2023-11-18",
-        time: "09:00",
-        venue: "Sports Complex",
-        capacity: 100,
-        registered: 65,
-        status: "available"
-      },
-      {
-        id: 3,
-        name: "Coding Hackathon",
-        description: "24-hour coding competition. Solve real-world problems and win exciting prizes.",
-        category: "tech",
-        date: "2023-11-20",
-        time: "10:00",
-        venue: "Computer Lab 3",
-        capacity: 40,
-        registered: 38,
-        status: "filling-fast"
-      },
-      {
-        id: 4,
-        name: "Art Exhibition",
-        description: "Display your artistic creations. All forms of visual art are welcome.",
-        category: "cultural",
-        date: "2023-11-22",
-        time: "11:00",
-        venue: "Art Gallery",
-        capacity: 30,
-        registered: 15,
-        status: "available"
-      },
-      {
-        id: 5,
-        name: "Robotics Workshop",
-        description: "Hands-on workshop on building and programming robots. No prior experience required.",
-        category: "tech",
-        date: "2023-11-25",
-        time: "13:00",
-        venue: "Engineering Building",
-        capacity: 25,
-        registered: 25,
-        status: "almost-full"
-      },
-      {
-        id: 6,
-        name: "Football Championship",
-        description: "Annual inter-college football tournament. Register your team now.",
-        category: "sports",
-        date: "2023-11-28",
-        time: "15:00",
-        venue: "Football Field",
-        capacity: 120,
-        registered: 95,
-        status: "available"
-      }
-    ];
-
-    // Load Events
-    function loadEvents() {
-      const eventsContainer = document.getElementById('events-container');
-      const eventsLoading = document.getElementById('events-loading');
-      
-      // Show loading state
-      eventsContainer.innerHTML = '';
-      eventsLoading.classList.remove('hidden');
-      
-      // Simulate API call delay
-      setTimeout(() => {
-        // Hide loading state
-        eventsLoading.classList.add('hidden');
-        
-        // Group events by category
-        const culturalEvents = events.filter(event => event.category === 'cultural');
-        const sportsEvents = events.filter(event => event.category === 'sports');
-        const techEvents = events.filter(event => event.category === 'tech');
-        
-        // Render events by category
-        if (culturalEvents.length > 0) {
-          renderEventCategory('cultural', 'Cultural Events', culturalEvents, eventsContainer);
-        }
-        
-        if (sportsEvents.length > 0) {
-          renderEventCategory('sports', 'Sports Events', sportsEvents, eventsContainer);
-        }
-        
-        if (techEvents.length > 0) {
-          renderEventCategory('tech', 'Tech Events', techEvents, eventsContainer);
-        }
-      }, 1000);
-    }
-
-    // Render Event Category
-    function renderEventCategory(category, title, events, container) {
-      const categorySection = document.createElement('div');
-      categorySection.className = 'category-section';
-      
-      const categoryHeader = document.createElement('div');
-      categoryHeader.className = 'category-header';
-      
-      // Category icon based on type
-      let iconClass = '';
-      let iconName = '';
-      
-      switch(category) {
-        case 'cultural':
-          iconClass = 'cultural';
-          iconName = 'palette';
-          break;
-        case 'sports':
-          iconClass = 'sports';
-          iconName = 'trophy';
-          break;
-        case 'tech':
-          iconClass = 'tech';
-          iconName = 'code';
-          break;
-      }
-      
-      categoryHeader.innerHTML = `
-        <div class="category-icon ${iconClass}">
-          <i data-lucide="${iconName}" class="w-6 h-6"></i>
-        </div>
-        <h3 class="category-title">${title}</h3>
-        <div class="category-divider"></div>
-      `;
-      
-      categorySection.appendChild(categoryHeader);
-      
-      const eventsGrid = document.createElement('div');
-      eventsGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
-      
-      events.forEach(event => {
-        const eventCard = document.createElement('div');
-        eventCard.className = 'event-card';
-        eventCard.innerHTML = `
-          <div class="event-card-header">
-            <div class="flex justify-between items-start mb-3">
-              <h4 class="font-bold text-lg text-gray-800">${event.name}</h4>
-              <span class="event-status ${event.status}">
-                ${event.status === 'almost-full' ? 'Almost Full' : 
-                  event.status === 'filling-fast' ? 'Filling Fast' : 'Available'}
-              </span>
-            </div>
-            <p class="text-gray-600 text-sm mb-4">${event.description}</p>
-            <div class="flex justify-between items-center text-sm text-gray-500">
-              <div class="flex items-center gap-1">
-                <i data-lucide="calendar" class="w-4 h-4"></i>
-                <span>${formatDate(event.date)}</span>
-              </div>
-              <div class="flex items-center gap-1">
-                <i data-lucide="clock" class="w-4 h-4"></i>
-                <span>${event.time}</span>
-              </div>
-              <div class="flex items-center gap-1">
-                <i data-lucide="map-pin" class="w-4 h-4"></i>
-                <span>${event.venue}</span>
-              </div>
-            </div>
-          </div>
-          <div class="event-card-content">
-            <div class="p-4 border-t border-gray-100">
-              <div class="flex justify-between items-center mb-4">
-                <span class="text-sm text-gray-600">Registration Progress</span>
-                <span class="text-sm font-medium text-gray-800">${event.registered}/${event.capacity}</span>
-              </div>
-              <div class="w-full bg-gray-200 rounded-full h-2">
-                <div class="bg-orange-500 h-2 rounded-full" style="width: ${(event.registered / event.capacity) * 100}%"></div>
-              </div>
-              <button class="register-button mt-4" onclick="openRegistrationModal(${event.id}, '${event.name}')">
-                <i data-lucide="user-plus" class="w-4 h-4"></i>
-                Register Now
-              </button>
-            </div>
-          </div>
-          <div class="p-4 border-t border-gray-100 flex justify-between items-center cursor-pointer" onclick="toggleEventCard(this.parentNode)">
-            <span class="text-sm font-medium text-gray-700">View Details</span>
-            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500 chevron-icon"></i>
-          </div>
-        `;
-        
-        eventsGrid.appendChild(eventCard);
-      });
-      
-      categorySection.appendChild(eventsGrid);
-      container.appendChild(categorySection);
-      
-      // Re-initialize icons for new elements
-      lucide.createIcons();
-    }
-
-    // Toggle Event Card
-    function toggleEventCard(card) {
-      card.classList.toggle('expanded');
-    }
-
-    // Format Date
-    function formatDate(dateString) {
-      const options = { year: 'numeric', month: 'short', day: 'numeric' };
-      return new Date(dateString).toLocaleDateString(undefined, options);
-    }
-
-    // Filter Events
-    let currentFilter = 'all';
-
+    // Search and filter functionality
     function setFilter(filter) {
       currentFilter = filter;
       
       // Update active filter button
-      document.querySelectorAll('.filter-button').forEach(button => {
-        button.classList.remove('active');
-      });
-      event.target.classList.add('active');
+      document.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`.filter-button[onclick="setFilter('${filter}')"]`).classList.add('active');
       
       filterEvents();
     }
 
     function filterEvents() {
-      const searchTerm = document.getElementById('search-input').value.toLowerCase();
-      
-      // For demo purposes, we'll just reload events with the filter applied
-      // In a real application, you would filter the existing events
-      loadEvents();
+      searchQuery = document.getElementById('search-input').value.toLowerCase();
+      renderEvents();
     }
 
-    // Share Event
+    // Form submission
+    document.getElementById('registration-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitButton = document.getElementById('submit-button');
+      const originalText = submitButton.innerHTML;
+      
+      // Show loading state
+      submitButton.innerHTML = '<span class="loading-spinner"></span> Processing...';
+      submitButton.disabled = true;
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const formData = new FormData(e.target);
+      const name = formData.get('name').trim();
+      const email = formData.get('email').trim();
+      const school = formData.get('school').trim();
+      const phone = formData.get('phone').trim();
+      
+      if (name && email && school && selectedEvent) {
+        // Save to local storage
+        const registration = {
+          id: Date.now(),
+          eventId: selectedEvent.id,
+          eventName: selectedEvent.name,
+          studentName: name,
+          studentEmail: email,
+          studentSchool: school,
+          studentPhone: phone,
+          timestamp: new Date().toISOString()
+        };
+        
+        const registrations = JSON.parse(localStorage.getItem('zyncRegistrations') || '[]');
+        registrations.push(registration);
+        localStorage.setItem('zyncRegistrations', JSON.stringify(registrations));
+        
+        // Show success message
+        showToast(`Successfully registered for ${selectedEvent.name}! Check your email for confirmation.`);
+        closeModal();
+      } else {
+        showToast('Please fill all required fields', 'error');
+      }
+      
+      // Restore button state
+      submitButton.innerHTML = originalText;
+      submitButton.disabled = false;
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('registration-modal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        closeModal();
+      }
+    });
+
+    // Social sharing
     function shareEvent(platform) {
+      const eventName = "Zync Events";
       const eventUrl = window.location.href;
-      let shareUrl = '';
+      let shareUrl = "";
       
       switch(platform) {
         case 'facebook':
           shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventUrl)}`;
           break;
         case 'twitter':
-          shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(eventUrl)}&text=Check out these amazing events!`;
+          shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out ${eventName} events!`)}&url=${encodeURIComponent(eventUrl)}`;
           break;
         case 'linkedin':
           shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(eventUrl)}`;
           break;
         case 'whatsapp':
-          shareUrl = `https://wa.me/?text=Check out these amazing events! ${encodeURIComponent(eventUrl)}`;
+          shareUrl = `https://wa.me/?text=${encodeURIComponent(`Check out ${eventName}: ${eventUrl}`)}`;
           break;
       }
       
-      if (shareUrl) {
-        window.open(shareUrl, '_blank', 'width=600,height=400');
-      }
+      window.open(shareUrl, '_blank', 'width=600,height=400');
     }
 
-    // Close modal when clicking outside
-    document.getElementById('registration-modal').addEventListener('click', function(event) {
-      if (event.target === this) {
-        closeModal();
-      }
-    });
+    // Render events
+    function renderEvents() {
+      const container = document.getElementById('events-container');
+      const loadingElement = document.getElementById('events-loading');
+      const noEventsElement = document.getElementById('no-events-message');
+      
+      // Show loading state
+      container.innerHTML = '';
+      loadingElement.classList.remove('hidden');
+      noEventsElement.classList.add('hidden');
+      
+      // Simulate loading delay
+      setTimeout(() => {
+        loadingElement.classList.add('hidden');
+        
+        // Filter events based on search and category filter
+        const filteredEvents = events.filter(event => {
+          const category = getCategoryById(event.categoryId);
+          const matchesSearch = searchQuery === '' || 
+            event.name.toLowerCase().includes(searchQuery) ||
+            event.description.toLowerCase().includes(searchQuery) ||
+            event.venue.toLowerCase().includes(searchQuery);
+          
+          const matchesCategory = currentFilter === 'all' || 
+            category.name.toLowerCase() === currentFilter;
+          
+          return matchesSearch && matchesCategory;
+        });
+        
+        if (filteredEvents.length === 0) {
+          noEventsElement.classList.remove('hidden');
+          return;
+        }
+        
+        // Group events by category
+        const eventsByCategory = {};
+        filteredEvents.forEach(event => {
+          const categoryId = event.categoryId;
+          if (!eventsByCategory[categoryId]) {
+            eventsByCategory[categoryId] = [];
+          }
+          eventsByCategory[categoryId].push(event);
+        });
+        
+        // Render events by category
+        Object.keys(eventsByCategory).forEach(categoryId => {
+          const categoryEvents = eventsByCategory[categoryId];
+          const category = getCategoryById(parseInt(categoryId));
+          
+          if (categoryEvents.length === 0) return;
+  
+          const categorySection = document.createElement('div');
+          categorySection.className = 'category-section';
+  
+          categorySection.innerHTML = `
+            <div class="category-header">
+              <div class="category-icon ${category.iconClass}">
+                <i data-lucide="${category.icon}" class="w-6 h-6"></i>
+              </div>
+              <h3 class="category-title">${category.name}</h3>
+              <div class="category-divider"></div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              ${categoryEvents.map(event => {
+                const availability = getAvailabilityStatus(event.currentParticipants, event.maxParticipants);
+                
+                return `
+                  <div id="event-${event.id}" class="event-card" onclick="toggleEventExpansion(${event.id})">
+                    <div class="event-card-header">
+                      <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                          <h4 class="text-xl font-bold text-gray-800 mb-2">
+                            ${event.name}
+                          </h4>
+                          ${event.description ? `<p class="text-gray-600 text-sm mb-3">${event.description}</p>` : ''}
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span class="event-status ${availability.className}">
+                            ${availability.text}
+                          </span>
+                          <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 chevron-icon"></i>
+                        </div>
+                      </div>
+                      
+                      <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-gray-600">
+                          <i data-lucide="calendar" class="w-4 h-4"></i>
+                          <span class="text-sm">${formatDate(event.date)}</span>
+                        </div>
+                        ${event.venue ? `
+                          <div class="flex items-center gap-2 text-gray-600">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            <span class="text-sm">${event.venue}</span>
+                          </div>
+                        ` : ''}
+                        ${event.maxParticipants ? `
+                          <div class="flex items-center gap-2 text-gray-600">
+                            <i data-lucide="users" class="w-4 h-4"></i>
+                            <span class="text-sm">
+                              ${event.currentParticipants}/${event.maxParticipants} participants
+                            </span>
+                          </div>
+                        ` : ''}
+                      </div>
+                    </div>
+                    
+                    <div class="event-card-content">
+                      <div class="px-6 pb-6 border-t border-gray-100 pt-4">
+                        <div class="space-y-4">
+                          <div>
+                            <h5 class="font-semibold text-gray-800 mb-2">Event Details</h5>
+                            <div class="text-sm text-gray-600 space-y-1">
+                              <p><strong>Category:</strong> ${category.name}</p>
+                              <p><strong>Duration:</strong> Full day event</p>
+                              <p><strong>Requirements:</strong> No prior experience needed</p>
+                              <p><strong>What to bring:</strong> Laptop, enthusiasm, and creativity!</p>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <h5 class="font-semibold text-gray-800 mb-2">What You'll Get</h5>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                              <li>• Certificate of participation</li>
+                              <li>• Networking opportunities</li>
+                              <li>• Refreshments and meals</li>
+                              <li>• Exciting prizes for winners</li>
+                            </ul>
+                          </div>
+                          
+                          <button
+                            class="register-button"
+                            onclick="event.stopPropagation(); openRegistrationModal(${event.id})"
+                          >
+                            Register Now
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                          </button>
+
+                          <div class="social-share">
+                            <div class="social-button facebook" onclick="event.stopPropagation(); shareEvent('facebook', ${event.id})">
+                              <i data-lucide="facebook" class="w-4 h-4"></i>
+                            </div>
+                            <div class="social-button twitter" onclick="event.stopPropagation(); shareEvent('twitter', ${event.id})">
+                              <i data-lucide="twitter" class="w-4 h-4"></i>
+                            </div>
+                            <div class="social-button linkedin" onclick="event.stopPropagation(); shareEvent('linkedin', ${event.id})">
+                              <i data-lucide="linkedin" class="w-4 h-4"></i>
+                            </div>
+                            <div class="social-button whatsapp" onclick="event.stopPropagation(); shareEvent('whatsapp', ${event.id})">
+                              <i data-lucide="message-circle" class="w-4 h-4"></i>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `;
+  
+          container.appendChild(categorySection);
+        });
+  
+        // Re-initialize Lucide icons for newly created elements
+        lucide.createIcons();
+      }, 800); // Simulated loading delay
+    }
 
     // Initialize the page
-    document.addEventListener('DOMContentLoaded', function() {
-      loadEvents();
+    document.addEventListener('DOMContentLoaded', () => {
+      showTab('about');
+      
+      // Initialize FAQ items
+      document.querySelectorAll('.faq-answer').forEach(answer => {
+        answer.style.maxHeight = null;
+      });
     });
   </script>
 </body>
