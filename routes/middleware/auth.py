@@ -1,7 +1,7 @@
 from flask import Blueprint,request
 from modules.sql_manager import SqlManager
 
-non_auth_routes = ["/admin/login","/home","/admin/signup","/admin/api/signup","/favicon.ico"]
+non_auth_routes = ["/admin/login","/home","/admin/signup","/admin/api/signup","/admin/api/login","/favicon.ico"]
 def authenticate_user():
     if request.path not in non_auth_routes:
         is_authenticated = False

@@ -12,6 +12,7 @@ class EventHandler():
     def get_all_events(self):
         return get_all_events(self=self)
     def __exit__(self, exc_type, exc_val, exc_tb):
+        self.connection.commit()
         self.cursor.close()
         self.connection.close()
 
