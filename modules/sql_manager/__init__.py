@@ -1,4 +1,5 @@
 import mysql.connector
+from .ClientEventHandler import ClientEventHandler
 from .UserHandler import Userhandler
 from .EventHandler import EventHandler
 class SqlManager:
@@ -14,9 +15,12 @@ class SqlManager:
     def EventHandler(self):
         #self.cursor = self.conn.cursor()
         return EventHandler(self.conn,self.cursor)
+    def ClientEventHandler(self):
+        return ClientEventHandler(self.conn,self.cursor)
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.cursor.close()
         self.conn.close()
     def close(self):
+        self.conn.commit()
         self.cursor.close()
         self.conn.close()

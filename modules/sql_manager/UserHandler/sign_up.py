@@ -1,13 +1,15 @@
-def sign_up(self,email,password,name,auth_key): 
-    #query = f"insert into users values({name},{email},{password},{auth_key},null,null)"
+def sign_up(self, email, password, name, auth_key):
     try:
-        query = f'INSERT INTO users VALUES("{name}","{email}","{password}","{auth_key}",null,null);'
-        #print(query)
-        self.cursor.execute(query)
-        result = self.cursor.fetchall()
+        # Use parameterized query to prevent SQL injection
+        query = """
+            INSERT INTO users (name, email, password, auth_key, created_at, updated_at)
+            VALUES (%s, %s, %s, %s, NULL, NULL);
+        """
+        self.cursor.execute(query, (name, email, password, auth_key))
         self.connection.commit()
-        return True,200,"signup success",auth_key
+
+        return True, 200, "Signup success", auth_key
+
     except Exception as e:
-        print(e)
-        return False,500,"signup failed",None
-    
+        print("ERROR OCCURRED:", e)
+        return False, 500, "Signup failed", str(e)

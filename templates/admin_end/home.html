@@ -681,6 +681,7 @@
         try {
             const newEvent = await addEventAPI(eventData);
             events.push(newEvent);
+            location.reload()
             document.getElementById('addEventForm').reset();
             showTab('manage');
         } catch (error) {
@@ -734,6 +735,7 @@
             events = await fetchInitialDataAPI();
             showTab('manage'); 
             document.getElementById('tab-manage').classList.add('tab-active');
+            // location.reload()
         } catch (error) {
             console.error("Failed to initialize app:", error);
             document.querySelector('main > div').innerHTML = '<p class="text-center text-red-500 font-bold">Failed to load event data. Please refresh the page.</p>';
