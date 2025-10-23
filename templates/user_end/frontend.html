@@ -1105,6 +1105,7 @@
 
   <script>
     // Initialize Lucide icons
+    const about_container = document.getElementById('content-about');
     lucide.createIcons();
 
     // Data
@@ -1257,7 +1258,7 @@
       // Update tab buttons
       document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
       document.getElementById(`tab-${tab}`).classList.add('active');
-
+      about_container.classList.remove('hidden');
       // Update tab content
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
       document.getElementById(`content-${tab}`).classList.add('active');
@@ -1428,6 +1429,7 @@
 
     // Render events
     function renderEvents() {
+      
       const container = document.getElementById('events-container');
       const loadingElement = document.getElementById('events-loading');
       const noEventsElement = document.getElementById('no-events-message');
@@ -1436,6 +1438,7 @@
       container.innerHTML = '';
       loadingElement.classList.remove('hidden');
       noEventsElement.classList.add('hidden');
+      about_container.classList.add('hidden');
       
       // Simulate loading delay
       setTimeout(() => {
