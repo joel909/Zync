@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <title>Login</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
 </head>
 
 <body class="bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 min-h-screen flex items-center justify-center font-sans text-gray-800">
@@ -45,41 +44,48 @@
   </div>
 </body>
 <script>
-  const submitButton = document.getElementById("login-btn")
-  const password = document.getElementById("password_box")
-  const email = document.getElementById("email_box")
-   async function requestLogin(email,password) {
-      requestData = {email:email,password:password}
-      const request = await fetch("api/login",{
-        method:"POST",
-        headers:{'Content-Type': 'application/json'},
-        body : JSON.stringify(requestData)
-      })
+  const submitButton = document.getElementById("login-btn");
+  const password = document.getElementById("password_box");
+  const email = document.getElementById("email_box");
 
-      const responeContent = await request.json();
-      //console.log(responeContent)
-      return responeContent
-    }
-    
-    async function handleLogin(){
-      try{
-        response = await requestLogin(email.value,password.value)
-        if (response.code == 500){throw new Error(response.message)}
-        console.log(response.data)
-        // Set to expire in about 10 years
+  async function requestLogin(email, password) {
+    const requestData = { email: email, password: password };
+    const request = await fetch("api/login", {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestData)
+    });
+
+    const responseContent = await request.json();
+    return responseContent;
+  }
+  
+  async function handleLogin() {
+    try {
+      const response = await requestLogin(email.value, password.value);
+      
+      // Check for the specific error code from the API response
+      if (response.code == 500) {
+        // Show an alert for incorrect login details
+        console.error(`Login failed: ${response.message}`);
+        alert("Wrong email or password. Please try again.");
+      } else if (response.data) {
+        // If login is successful, set the cookie and redirect
+        console.log("Login successful, redirecting...");
         const expires = new Date();
         expires.setFullYear(expires.getFullYear() + 10);
         document.cookie = `auth-key=${response.data}; expires=${expires.toUTCString()}; path=/`;
-        window.location.href = "/admin/dashboard"
-      }catch(e){
-        console.log(`error ${e}`)
-        alert(`error ${e}`)
+        window.location.href = "/admin/dashboard";
+      } else {
+        // Handle other unexpected response formats
+        throw new Error("Invalid response from server.");
       }
+    } catch (e) {
+      // Catch network errors or other exceptions
+      console.error(`An unexpected error occurred: ${e}`);
+      alert("An error occurred while trying to log in. Please try again later.");
     }
-
-    
-  
-  
+  }
 </script>
-
 </html>
+  

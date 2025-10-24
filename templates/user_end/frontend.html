@@ -791,12 +791,6 @@
                   </div>
                   <span class="font-medium text-gray-700">Sports</span>
                 </div>
-                <div class="flex items-center gap-3">
-                  <div class="p-1.5 rounded-lg bg-blue-50 border border-blue-200">
-                    <i data-lucide="code" class="w-4 h-4 text-blue-600"></i>
-                  </div>
-                  <span class="font-medium text-gray-700">Tech</span>
-                </div>
               </div>
             </div>
 
@@ -988,7 +982,6 @@
             <button class="filter-button active" onclick="setFilter('all')">All Events</button>
             <button class="filter-button" onclick="setFilter('cultural')">Cultural</button>
             <button class="filter-button" onclick="setFilter('sports')">Sports</button>
-            <button class="filter-button" onclick="setFilter('tech')">Tech</button>
           </div>
         </div>
         
@@ -1039,6 +1032,7 @@
               required
               class="form-input"
               placeholder="Enter your full name"
+              maxlength="300"
             />
           </div>
           
@@ -1054,6 +1048,7 @@
               required
               class="form-input"
               placeholder="Enter your email address"
+              maxlength="300"
             />
           </div>
           
@@ -1069,19 +1064,54 @@
               required
               class="form-input"
               placeholder="Enter your school name"
+              maxlength="300"
             />
           </div>
 
           <div>
-            <label for="student-phone" class="form-label">
-              <span>Phone Number</span>
+            <label for="student-dob" class="form-label">
+              <span>Date of Birth</span>
+              <span class="required-indicator">*</span>
+            </label>
+            <input
+              type="date"
+              id="student-dob"
+              name="dob"
+              required
+              class="form-input"
+              placeholder="YYYY-MM-DD"
+            />
+          </div>
+
+          <div>
+            <label for="student-grade" class="form-label">
+              <span>Grade</span>
+              <span class="required-indicator">*</span>
+            </label>
+            <input
+              type="text"
+              id="student-grade"
+              name="grade"
+              required
+              class="form-input"
+              placeholder="Enter your grade (e.g. 10, 11, A-level)"
+              maxlength="50"
+            />
+          </div>
+
+          <div>
+            <label for="student-contact" class="form-label">
+              <span>Contact Details</span>
+              <span class="required-indicator">*</span>
             </label>
             <input
               type="tel"
-              id="student-phone"
-              name="phone"
+              id="student-contact"
+              name="contact_details"
+              required
               class="form-input"
-              placeholder="Enter your phone number (optional)"
+              placeholder="Phone / alternate contact (max 50 chars)"
+              maxlength="50"
             />
           </div>
         </div>
@@ -1127,78 +1157,88 @@
         bgColor: 'bg-green-50 border-green-200',
         iconClass: 'sports'
       },
-      { 
-        id: 3, 
-        name: 'Tech', 
-        icon: 'code', 
-        color: 'text-blue-600',
-        bgColor: 'bg-blue-50 border-blue-200',
-        iconClass: 'tech'
-      },
     ];
 
-    const events = [
-      { 
-        id: 1, 
-        name: 'Game Development Jam', 
-        date: '2024-06-30', 
-        venue: 'Online', 
-        categoryId: 3,
-        description: '48-hour game development competition',
-        maxParticipants: 100,
-        currentParticipants: 67
-      },
-      { 
-        id: 2, 
-        name: 'Web3 Hackathon', 
-        date: '2024-07-15', 
-        venue: 'Main Hall', 
-        categoryId: 3,
-        description: 'Build the future of decentralized applications',
-        maxParticipants: 80,
-        currentParticipants: 23
-      },
-      { 
-        id: 3, 
-        name: 'AI Innovation Challenge', 
-        date: '2024-07-05', 
-        venue: 'Tech Center', 
-        categoryId: 3,
-        description: 'Explore the possibilities of artificial intelligence',
-        maxParticipants: 60,
-        currentParticipants: 45
-      },
-      { 
-        id: 4, 
-        name: 'Football Tournament', 
-        date: '2024-06-20', 
-        venue: 'Stadium', 
-        categoryId: 2,
-        description: 'Inter-college football championship',
-        maxParticipants: 200,
-        currentParticipants: 156
-      },
-      { 
-        id: 5, 
-        name: 'Music Festival', 
-        date: '2024-06-25', 
-        venue: 'Auditorium', 
-        categoryId: 1,
-        description: 'Celebrate music and arts with performances',
-        maxParticipants: 300,
-        currentParticipants: 234
-      },
-      { 
-        id: 6, 
-        name: 'Cultural Dance Competition', 
-        date: '2024-07-10', 
-        venue: 'Main Stage', 
-        categoryId: 1,
-        description: 'Showcase traditional and modern dance forms',
-        maxParticipants: 150,
-        currentParticipants: 89
-      },
-    ];
+    // events will be populated from the API
+    let events = [];
+
+    // Fetch events from API and populate `events`. Alert on failure.
+    async function fetchEvents() {
+      const container = document.getElementById('events-container');
+      const loadingElement = document.getElementById('events-loading');
+      const noEventsElement = document.getElementById('no-events-message');
+
+      // Show loading UI
+      container.innerHTML = '';
+      loadingElement.classList.remove('hidden');
+      noEventsElement.classList.add('hidden');
+      about_container.classList.add('hidden');
+      register_container.classList.remove('hidden');
+
+      try {
+        const resp = await fetch('admin/api/event/get');
+        if (!resp.ok) throw new Error('Network response was not ok');
+        const result = await resp.json();
+
+        // API may return either an array of rows or an object like { code, data, message }
+        const rows = Array.isArray(result) ? result : (Array.isArray(result.data) ? result.data : []);
+
+        // Map server rows to frontend event shape.
+        // Accepts either row arrays (like your example) or objects.
+        events = (rows || []).map(row => {
+          // helper to resolve category id from a string type (e.g. 'sports'|'cultural')
+          const resolveCategoryId = (typeStr, fallback = 1) => {
+            if (!typeStr) return fallback;
+            const t = String(typeStr).toLowerCase();
+            const matched = categories.find(c => c.name.toLowerCase() === t);
+            return matched ? matched.id : fallback;
+          };
+
+          if (Array.isArray(row)) {
+            const typeStr = row[1];
+            return {
+              id: row[0],
+              type: typeStr,
+              core_event: row[1] ?? null,
+              name: row[2],
+              description: row[3] || '',
+              date: row[4] ? String(row[4]) : '',
+              venue: row[5] || '',
+              maxParticipants: row[6] || 0,
+              currentParticipants: row[7] || 0,
+              categoryId: resolveCategoryId(row[8] ?? typeStr, 1)
+            };
+          } else {
+            const typeStr = row.type ?? row.category ?? '';
+            return {
+              id: row.id ?? row.event_id ?? row.eventId,
+              type: typeStr,
+              // core_event should come from explicit core_event/coreEvent or fallback to type
+              core_event: row.core_event ?? row.coreEvent ?? typeStr ?? null,
+              name: row.name ?? row.event_name ?? row.eventName ?? '',
+              description: row.description ?? row.desc ?? row.note ?? '',
+              date: row.date ?? row.ev_date ?? (row[4] ? String(row[4]) : ''),
+              venue: row.venue ?? row.location ?? '',
+              maxParticipants: row.maxParticipants ?? row.max_participants ?? 0,
+              currentParticipants: row.currentParticipants ?? row.current_participants ?? 0,
+              categoryId: resolveCategoryId(typeStr, row.categoryId ?? row.category_id ?? 1)
+            };
+          }
+        });
+
+        // Render results
+        loadingElement.classList.add('hidden');
+        if (!events.length) {
+          noEventsElement.classList.remove('hidden');
+          return;
+        }
+        renderEvents();
+      } catch (err) {
+        loadingElement.classList.add('hidden');
+        alert('Failed to fetch events. Please try again later.');
+        console.error('fetchEvents error:', err);
+      }
+    }
 
     let expandedEvent = null;
     let selectedEvent = null;
@@ -1267,7 +1307,8 @@
       document.getElementById(`content-${tab}`).classList.add('active');
 
       if (tab === 'register') {
-        renderEvents();
+        // Fetch latest events from the server before rendering
+        fetchEvents();
       }
     }
 
@@ -1479,122 +1520,67 @@
         
         // Render events by category
         Object.keys(eventsByCategory).forEach(categoryId => {
-          const categoryEvents = eventsByCategory[categoryId];
-          const category = getCategoryById(parseInt(categoryId));
-          
-          if (categoryEvents.length === 0) return;
-  
-          const categorySection = document.createElement('div');
-          categorySection.className = 'category-section';
-  
-          categorySection.innerHTML = `
-            <div class="category-header">
-              <div class="category-icon ${category.iconClass}">
-                <i data-lucide="${category.icon}" class="w-6 h-6"></i>
-              </div>
-              <h3 class="category-title">${category.name}</h3>
-              <div class="category-divider"></div>
-            </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              ${categoryEvents.map(event => {
-                const availability = getAvailabilityStatus(event.currentParticipants, event.maxParticipants);
-                
-                return `
-                  <div id="event-${event.id}" class="event-card" onclick="toggleEventExpansion(${event.id})">
-                    <div class="event-card-header">
-                      <div class="flex justify-between items-start mb-4">
-                        <div class="flex-1">
-                          <h4 class="text-xl font-bold text-gray-800 mb-2">
-                            ${event.name}
-                          </h4>
-                          ${event.description ? `<p class="text-gray-600 text-sm mb-3">${event.description}</p>` : ''}
-                        </div>
-                        <div class="flex items-center gap-2">
-                          <span class="event-status ${availability.className}">
-                            ${availability.text}
-                          </span>
-                          <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400 chevron-icon"></i>
-                        </div>
-                      </div>
-                      
-                      <div class="space-y-2">
-                        <div class="flex items-center gap-2 text-gray-600">
-                          <i data-lucide="calendar" class="w-4 h-4"></i>
-                          <span class="text-sm">${formatDate(event.date)}</span>
-                        </div>
-                        ${event.venue ? `
-                          <div class="flex items-center gap-2 text-gray-600">
-                            <i data-lucide="map-pin" class="w-4 h-4"></i>
-                            <span class="text-sm">${event.venue}</span>
-                          </div>
-                        ` : ''}
-                        ${event.maxParticipants ? `
-                          <div class="flex items-center gap-2 text-gray-600">
-                            <i data-lucide="users" class="w-4 h-4"></i>
-                            <span class="text-sm">
-                              ${event.currentParticipants}/${event.maxParticipants} participants
-                            </span>
-                          </div>
-                        ` : ''}
-                      </div>
-                    </div>
-                    
-                    <div class="event-card-content">
-                      <div class="px-6 pb-6 border-t border-gray-100 pt-4">
-                        <div class="space-y-4">
-                          <div>
-                            <h5 class="font-semibold text-gray-800 mb-2">Event Details</h5>
-                            <div class="text-sm text-gray-600 space-y-1">
-                              <p><strong>Category:</strong> ${category.name}</p>
-                              <p><strong>Duration:</strong> Full day event</p>
-                              <p><strong>Requirements:</strong> No prior experience needed</p>
-                              <p><strong>What to bring:</strong> Laptop, enthusiasm, and creativity!</p>
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <h5 class="font-semibold text-gray-800 mb-2">What You'll Get</h5>
-                            <ul class="text-sm text-gray-600 space-y-1">
-                              <li>• Certificate of participation</li>
-                              <li>• Networking opportunities</li>
-                              <li>• Refreshments and meals</li>
-                              <li>• Exciting prizes for winners</li>
-                            </ul>
-                          </div>
-                          
-                          <button
-                            class="register-button"
-                            onclick="event.stopPropagation(); openRegistrationModal(${event.id})"
-                          >
-                            Register Now
-                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
-                          </button>
+      const categoryEvents = eventsByCategory[categoryId];
+      const category = getCategoryById(parseInt(categoryId));
+      
+      if (categoryEvents.length === 0) return;
 
-                          <div class="social-share">
-                            <div class="social-button facebook" onclick="event.stopPropagation(); shareEvent('facebook', ${event.id})">
-                              <i data-lucide="facebook" class="w-4 h-4"></i>
-                            </div>
-                            <div class="social-button twitter" onclick="event.stopPropagation(); shareEvent('twitter', ${event.id})">
-                              <i data-lucide="twitter" class="w-4 h-4"></i>
-                            </div>
-                            <div class="social-button linkedin" onclick="event.stopPropagation(); shareEvent('linkedin', ${event.id})">
-                              <i data-lucide="linkedin" class="w-4 h-4"></i>
-                            </div>
-                            <div class="social-button whatsapp" onclick="event.stopPropagation(); shareEvent('whatsapp', ${event.id})">
-                              <i data-lucide="message-circle" class="w-4 h-4"></i>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+      const categorySection = document.createElement('div');
+      categorySection.className = 'category-section';
+
+      categorySection.innerHTML = `
+        <div class="category-header">
+          <div class="category-icon ${category.iconClass}">
+            <i data-lucide="${category.icon}" class="w-6 h-6"></i>
+          </div>
+          <h3 class="category-title">${category.name}</h3>
+          <div class="category-divider"></div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          ${categoryEvents.map(event => {
+            return `
+              <div id="event-${event.id}" class="event-card">
+                <div class="event-card-header">
+                  <div class="flex-1">
+                    <h4 class="text-xl font-bold text-gray-800 mb-2">
+                      ${event.name}
+                    </h4>
+                    <p class="text-gray-500 text-sm mb-3">
+                      <strong>Core Event:</strong> ${event.core_event || category.name}
+                    </p>
+                    ${event.description ? `<p class="text-gray-600 text-sm mb-3">${event.description}</p>` : ''}
                   </div>
-                `;
-              }).join('')}
-            </div>
-          `;
-  
-          container.appendChild(categorySection);
-        });
+                  
+                  <div class="space-y-2 mb-4">
+                    <div class="flex items-center gap-2 text-gray-600">
+                      <i data-lucide="calendar" class="w-4 h-4"></i>
+                      <span class="text-sm">${formatDate(event.date)}</span>
+                    </div>
+                    ${event.venue ? `
+                      <div class="flex items-center gap-2 text-gray-600">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i>
+                        <span class="text-sm">${event.venue}</span>
+                      </div>
+                    ` : ''}
+                  </div>
+
+                  <button
+                    class="register-button"
+                    onclick="openRegistrationModal(${event.id})"
+                  >
+                    Register Now
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+
+      container.appendChild(categorySection);
+});
+
   
         // Re-initialize Lucide icons for newly created elements
         lucide.createIcons();
