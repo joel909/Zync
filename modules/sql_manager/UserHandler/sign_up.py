@@ -2,8 +2,8 @@ def sign_up(self, email, password, name, auth_key):
     try:
         # Use parameterized query to prevent SQL injection
         query = """
-            INSERT INTO users (name, email, password, auth_key, created_at, updated_at)
-            VALUES (%s, %s, %s, %s, NULL, NULL);
+            INSERT INTO users (name, email, password, auth_key)
+            VALUES (%s, %s, %s, %s);
         """
         self.cursor.execute(query, (name, email, password, auth_key))
         self.connection.commit()
