@@ -5,7 +5,7 @@ def register_for_event(self, event_id, name, school, dob, grade, contact):
 
         # Insert registration record into the database
         insert_query = """
-            INSERT INTO event_registrations (event_id, name, school, DOB, grade, contact)
+            INSERT INTO registrations (event_id, name, school, DOB, grade, contact_details)
             VALUES (%s, %s, %s, %s, %s, %s);
         """
         self.cursor.execute(insert_query, (event_id, name, school, dob, grade, contact))

@@ -11,7 +11,7 @@ from routes.api.auth_api.login_api import login_api_obj
 from routes.api.auth_api.sign_up_api import signup_api_obj
 from routes.api.event_api.create_event_api import create_event_api_obj
 from routes.api.event_api.display_events_api import display_event_api_obj
-
+from routes.api.event_api.register_for_event_api import register_for_event_api_obj
 
 from routes.middleware.auth import authenticate_user
 from flask import Blueprint, request, g,redirect,url_for    
@@ -55,6 +55,8 @@ def create_app():
     ##create event API
     app.register_blueprint(create_event_api_obj,url_prefix="/admin/api")
 
+    ## register for event API
+    app.register_blueprint(register_for_event_api_obj,url_prefix="/api")
     print("all the registered endpoints are : ",app.url_map)
     
 

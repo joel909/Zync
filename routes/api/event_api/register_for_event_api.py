@@ -1,11 +1,10 @@
 from modules.sql_manager import SqlManager
 from flask import Blueprint, request
-
 from modules.utiles.create_response import create_response
 register_for_event_api_obj = Blueprint("register_for_event_api",__name__)
 
 
-@register_for_event_api_obj.route("/event/register",methods=["GET"])
+@register_for_event_api_obj.route("/event/register",methods=["POST"])
 def fetch_events():
     try:
         event_id = request.get_json()["event_id"]

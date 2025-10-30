@@ -17,7 +17,7 @@ def signin(self, email, password):
             return True, 200, "Sign-in success", auth_key
         else:
             print("Incorrect password.")
-            return False, 401, "Sign-in failed: Incorrect password", None
+            return False, 500, "Sign-in failed: Incorrect password", None
 
     except Exception as e:
         print("ERROR OCCURRED:", e)

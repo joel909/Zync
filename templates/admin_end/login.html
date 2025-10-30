@@ -65,7 +65,11 @@
       const response = await requestLogin(email.value, password.value);
       
       // Check for the specific error code from the API response
-      if (response.code == 500) {
+      if (response.code == 404) {
+        console.error(`Login failed: ${response.message}`);
+        alert("User not found. Please check your email.");
+      }
+      else if (response.code == 500) {
         // Show an alert for incorrect login details
         console.error(`Login failed: ${response.message}`);
         alert("Wrong email or password. Please try again.");

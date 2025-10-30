@@ -283,6 +283,9 @@
       visibility: hidden;
       transition: all 0.3s ease;
       padding: 1rem;
+      /* allow page scrolling when modal content is taller than viewport */
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .modal-overlay.show {
@@ -296,6 +299,10 @@
       padding: 2rem;
       max-width: 28rem;
       width: 100%;
+      /* Make modal fit available viewport height and allow internal scrolling */
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
+      box-sizing: border-box;
       box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
       transform: scale(0.9) translateY(20px);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -684,6 +691,8 @@
       .modal-content {
         margin: 1rem;
         padding: 1.5rem;
+        /* ensure mobile modal also respects viewport height */
+        max-height: calc(100vh - 2.5rem);
       }
 
       .toast {
@@ -691,7 +700,7 @@
         left: 1rem;
         bottom: 1rem;
       }
-	  
+      
     }
   </style>
 </head>
@@ -1019,6 +1028,7 @@
       </div>
       
       <form id="registration-form">
+        <input type="hidden" id="reg-id" name="reg_id" />
         <div class="space-y-4">
           <div>
             <label for="student-name" class="form-label">
@@ -1125,6 +1135,18 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Result Modal (success / failure) -->
+  <div id="result-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content text-center">
+      <div id="result-icon" class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"></div>
+      <h3 id="result-title" class="text-xl font-bold mb-2"></h3>
+      <p id="result-message" class="text-gray-600 mb-4"></p>
+      <div class="button-group">
+        <button type="button" class="button-secondary" onclick="closeResultModal()">Close</button>
+      </div>
     </div>
   </div>
 
@@ -1238,364 +1260,371 @@
         alert('Failed to fetch events. Please try again later.');
         console.error('fetchEvents error:', err);
       }
-    }
-
-    let expandedEvent = null;
-    let selectedEvent = null;
-    let currentFilter = 'all';
-    let searchQuery = '';
-
-    // Utility functions
-    function formatDate(dateStr) {
-      if (!dateStr) return 'Date TBA';
-      const date = new Date(dateStr);
-      return isNaN(date.getTime()) ? dateStr : date.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
-      });
-    }
-
-    function getCategoryById(id) {
-      return categories.find(cat => cat.id === id);
-    }
-
-    function getAvailabilityStatus(current = 0, max = 0) {
-      if (max === 0) return { text: 'Open', className: 'available' };
-      const percentage = (current / max) * 100;
-      if (percentage >= 90) return { text: 'Almost Full', className: 'almost-full' };
-      if (percentage >= 70) return { text: 'Filling Fast', className: 'filling-fast' };
-      return { text: 'Available', className: 'available' };
-    }
-
-    // Toast notification
-    function showToast(message, type = 'success') {
-      const toast = document.getElementById('toast');
-      const toastMessage = document.getElementById('toast-message');
-      
-      toastMessage.textContent = message;
-      toast.className = `toast ${type}`;
-      toast.classList.add('show');
-      
-      // Update icon based on type
-      const icon = toast.querySelector('i');
-      if (type === 'success') {
-        icon.setAttribute('data-lucide', 'check-circle');
-        icon.className = 'w-6 h-6 text-green-500';
-      } else {
-        icon.setAttribute('data-lucide', 'x-circle');
-        icon.className = 'w-6 h-6 text-red-500';
-      }
-      lucide.createIcons();
-      
-      // Hide after 3 seconds
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
-    }
-
-    // Tab management
-    function showTab(tab) {
-      // Update tab buttons
-      
-      register_container.classList.add('hidden');
-      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-      document.getElementById(`tab-${tab}`).classList.add('active');
-      about_container.classList.remove('hidden');
-      // Update tab content
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      document.getElementById(`content-${tab}`).classList.add('active');
-
-      if (tab === 'register') {
-        // Fetch latest events from the server before rendering
-        fetchEvents();
+     }
+ 
+    // --- Helpers for filters, cookies and rendering (was missing) ---
+    let registeredEventIds = new Set();
+ 
+    function readRegisteredCookie() {
+      try {
+        const c = document.cookie.split('; ').find(row => row.startsWith('zync_registered='));
+        if (!c) return [];
+        const v = decodeURIComponent(c.split('=')[1] || '[]');
+        const arr = JSON.parse(v || '[]');
+        return Array.isArray(arr) ? arr : [];
+      } catch (err) {
+        return [];
       }
     }
-
-    // User menu
-    function toggleUserMenu() {
-      const dropdown = document.getElementById('user-dropdown');
-      dropdown.classList.toggle('show');
+ 
+    function loadRegisteredFromCookie() {
+      registeredEventIds = new Set(readRegisteredCookie().map(String));
     }
-
-    function logout() {
-      alert('Logging out...');
-    }
-
-    // Close user menu when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.user-menu')) {
-        document.getElementById('user-dropdown').classList.remove('show');
-      }
-    });
-
-    // FAQ toggle
-    function toggleFaq(element) {
-      const answer = element.nextElementSibling;
-      const icon = element.querySelector('i');
-      
-      if (answer.style.maxHeight) {
-        answer.style.maxHeight = null;
-        icon.style.transform = 'rotate(0deg)';
-      } else {
-        answer.style.maxHeight = answer.scrollHeight + 'px';
-        icon.style.transform = 'rotate(180deg)';
-      }
-    }
-
-    // Event management
-    function toggleEventExpansion(eventId) {
-      const eventCard = document.getElementById(`event-${eventId}`);
-      
-      if (expandedEvent === eventId) {
-        eventCard.classList.remove('expanded');
-        expandedEvent = null;
-      } else {
-        // Close previously expanded event
-        if (expandedEvent) {
-          document.getElementById(`event-${expandedEvent}`).classList.remove('expanded');
-        }
-        
-        eventCard.classList.add('expanded');
-        expandedEvent = eventId;
-      }
-    }
-
-    function openRegistrationModal(eventId) {
-      selectedEvent = events.find(e => e.id === eventId);
-      if (selectedEvent) {
-        document.getElementById('modal-event-name').textContent = selectedEvent.name;
-        document.getElementById('registration-modal').classList.add('show');
-      }
-    }
-
-    function closeModal() {
-      document.getElementById('registration-modal').classList.remove('show');
-      document.getElementById('registration-form').reset();
-      selectedEvent = null;
-    }
-
-    // Search and filter functionality
+ 
     function setFilter(filter) {
       currentFilter = filter;
-      
-      // Update active filter button
-      document.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('active'));
-      document.querySelector(`.filter-button[onclick="setFilter('${filter}')"]`).classList.add('active');
-      
-      filterEvents();
-    }
-
-    function filterEvents() {
-      searchQuery = document.getElementById('search-input').value.toLowerCase();
+      document.querySelectorAll('.filter-button').forEach(btn => btn.classList.toggle('active', btn.textContent.trim().toLowerCase() === (filter === 'all' ? 'all events' : filter)));
       renderEvents();
     }
-
-    // Form submission
-    document.getElementById('registration-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const submitButton = document.getElementById('submit-button');
-      const originalText = submitButton.innerHTML;
-      
-      // Show loading state
-      submitButton.innerHTML = '<span class="loading-spinner"></span> Processing...';
-      submitButton.disabled = true;
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const formData = new FormData(e.target);
-      const name = formData.get('name').trim();
-      const email = formData.get('email').trim();
-      const school = formData.get('school').trim();
-      const phone = formData.get('phone').trim();
-      
-      if (name && email && school && selectedEvent) {
-        // Save to local storage
-        const registration = {
-          id: Date.now(),
-          eventId: selectedEvent.id,
-          eventName: selectedEvent.name,
-          studentName: name,
-          studentEmail: email,
-          studentSchool: school,
-          studentPhone: phone,
-          timestamp: new Date().toISOString()
-        };
-        
-        const registrations = JSON.parse(localStorage.getItem('zyncRegistrations') || '[]');
-        registrations.push(registration);
-        localStorage.setItem('zyncRegistrations', JSON.stringify(registrations));
-        
-        // Show success message
-        showToast(`Successfully registered for ${selectedEvent.name}! Check your email for confirmation.`);
-        closeModal();
-      } else {
-        showToast('Please fill all required fields', 'error');
-      }
-      
-      // Restore button state
-      submitButton.innerHTML = originalText;
-      submitButton.disabled = false;
-    });
-
-    // Close modal when clicking outside
-    document.getElementById('registration-modal').addEventListener('click', (e) => {
-      if (e.target === e.currentTarget) {
-        closeModal();
-      }
-    });
-
-    // Social sharing
-    function shareEvent(platform) {
-      const eventName = "Zync Events";
-      const eventUrl = window.location.href;
-      let shareUrl = "";
-      
-      switch(platform) {
-        case 'facebook':
-          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventUrl)}`;
-          break;
-        case 'twitter':
-          shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out ${eventName} events!`)}&url=${encodeURIComponent(eventUrl)}`;
-          break;
-        case 'linkedin':
-          shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(eventUrl)}`;
-          break;
-        case 'whatsapp':
-          shareUrl = `https://wa.me/?text=${encodeURIComponent(`Check out ${eventName}: ${eventUrl}`)}`;
-          break;
-      }
-      
-      window.open(shareUrl, '_blank', 'width=600,height=400');
+ 
+    function filterEvents() {
+      const input = document.getElementById('search-input');
+      searchQuery = input ? input.value.trim().toLowerCase() : '';
+      renderEvents();
     }
-
-    // Render events
+ 
+    // Render events into UI. Uses existing globals: events, categories, currentFilter, searchQuery
     function renderEvents() {
-      
       const container = document.getElementById('events-container');
       const loadingElement = document.getElementById('events-loading');
       const noEventsElement = document.getElementById('no-events-message');
-      
-      // Show loading state
+      if (!container) return;
+ 
+      // Ensure registered list is loaded
+      loadRegisteredFromCookie();
+ 
       container.innerHTML = '';
-      loadingElement.classList.remove('hidden');
+      loadingElement.classList.add('hidden');
       noEventsElement.classList.add('hidden');
-      about_container.classList.add('hidden');
-      register_container.classList.remove('hidden');
-      
-      // Simulate loading delay
-      setTimeout(() => {
-        loadingElement.classList.add('hidden');
-        
-        // Filter events based on search and category filter
-        const filteredEvents = events.filter(event => {
-          const category = getCategoryById(event.categoryId);
-          const matchesSearch = searchQuery === '' || 
-            event.name.toLowerCase().includes(searchQuery) ||
-            event.description.toLowerCase().includes(searchQuery) ||
-            event.venue.toLowerCase().includes(searchQuery);
-          
-          const matchesCategory = currentFilter === 'all' || 
-            category.name.toLowerCase() === currentFilter;
-          
-          return matchesSearch && matchesCategory;
-        });
-        
-        if (filteredEvents.length === 0) {
-          noEventsElement.classList.remove('hidden');
-          return;
-        }
-        
-        // Group events by category
-        const eventsByCategory = {};
-        filteredEvents.forEach(event => {
-          const categoryId = event.categoryId;
-          if (!eventsByCategory[categoryId]) {
-            eventsByCategory[categoryId] = [];
-          }
-          eventsByCategory[categoryId].push(event);
-        });
-        
-        // Render events by category
-        Object.keys(eventsByCategory).forEach(categoryId => {
-      const categoryEvents = eventsByCategory[categoryId];
-      const category = getCategoryById(parseInt(categoryId));
-      
-      if (categoryEvents.length === 0) return;
-
-      const categorySection = document.createElement('div');
-      categorySection.className = 'category-section';
-
-      categorySection.innerHTML = `
-        <div class="category-header">
-          <div class="category-icon ${category.iconClass}">
-            <i data-lucide="${category.icon}" class="w-6 h-6"></i>
+ 
+      const q = searchQuery || '';
+      const filtered = events.filter(ev => {
+        const matchesSearch = q === '' || (ev.name && ev.name.toLowerCase().includes(q)) || (ev.description && ev.description.toLowerCase().includes(q)) || (ev.venue && ev.venue.toLowerCase().includes(q));
+        const cat = getCategoryById(ev.categoryId);
+        const matchesCategory = currentFilter === 'all' || (cat && cat.name && cat.name.toLowerCase() === currentFilter);
+        return matchesSearch && matchesCategory;
+      });
+ 
+      if (!filtered.length) {
+        noEventsElement.classList.remove('hidden');
+        return;
+      }
+ 
+      // Group by category id
+      const byCat = {};
+      filtered.forEach(ev => {
+        const cid = ev.categoryId || 0;
+        byCat[cid] = byCat[cid] || [];
+        byCat[cid].push(ev);
+      });
+ 
+      Object.keys(byCat).forEach(cid => {
+        const category = getCategoryById(parseInt(cid, 10)) || { name: 'Other', icon: 'calendar', iconClass: '' };
+        const section = document.createElement('div');
+        section.className = 'category-section';
+        section.innerHTML = `
+          <div class="category-header">
+            <div class="category-icon ${category.iconClass}">
+              <i data-lucide="${category.icon}" class="w-6 h-6"></i>
+            </div>
+            <h3 class="category-title">${category.name}</h3>
+            <div class="category-divider"></div>
           </div>
-          <h3 class="category-title">${category.name}</h3>
-          <div class="category-divider"></div>
-        </div>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          ${categoryEvents.map(event => {
-            return `
-              <div id="event-${event.id}" class="event-card">
-                <div class="event-card-header">
-                  <div class="flex-1">
-                    <h4 class="text-xl font-bold text-gray-800 mb-2">
-                      ${event.name}
-                    </h4>
-                    <p class="text-gray-500 text-sm mb-3">
-                      <strong>Core Event:</strong> ${event.core_event || category.name}
-                    </p>
-                    ${event.description ? `<p class="text-gray-600 text-sm mb-3">${event.description}</p>` : ''}
-                  </div>
-                  
-                  <div class="space-y-2 mb-4">
-                    <div class="flex items-center gap-2 text-gray-600">
-                      <i data-lucide="calendar" class="w-4 h-4"></i>
-                      <span class="text-sm">${formatDate(event.date)}</span>
-                    </div>
-                    ${event.venue ? `
-                      <div class="flex items-center gap-2 text-gray-600">
-                        <i data-lucide="map-pin" class="w-4 h-4"></i>
-                        <span class="text-sm">${event.venue}</span>
-                      </div>
-                    ` : ''}
-                  </div>
-
-                  <button
-                    class="register-button"
-                    onclick="openRegistrationModal(${event.id})"
-                  >
-                    Register Now
-                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
-                  </button>
-                </div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+        `;
+ 
+        const grid = section.querySelector('div.grid');
+        byCat[cid].forEach(ev => {
+          const isRegistered = registeredEventIds.has(String(ev.id));
+          const card = document.createElement('div');
+          card.id = `event-${ev.id}`;
+          card.className = 'event-card';
+          card.innerHTML = `
+            <div class="event-card-header">
+              <div class="flex-1">
+                <h4 class="text-xl font-bold text-gray-800 mb-2">${ev.name || 'Untitled event'}</h4>
+                <p class="text-gray-500 text-sm mb-3"><strong>Core Event:</strong> ${ev.core_event || category.name}</p>
+                ${ev.description ? `<p class="text-gray-600 text-sm mb-3">${ev.description}</p>` : ''}
               </div>
-            `;
-          }).join('')}
-        </div>
-      `;
+              <div class="space-y-2 mb-4">
+                <div class="flex items-center gap-2 text-gray-600">
+                  <i data-lucide="calendar" class="w-4 h-4"></i>
+                  <span class="text-sm">${formatDate(ev.date)}</span>
+                </div>
+                ${ev.venue ? `<div class="flex items-center gap-2 text-gray-600"><i data-lucide="map-pin" class="w-4 h-4"></i><span class="text-sm">${ev.venue}</span></div>` : ''}
+              </div>
+              ${isRegistered ? `<button class="button-secondary" disabled>Registered</button>` : `<button class="register-button" onclick="openRegistrationModal(${ev.id})">Register Now <i data-lucide="chevron-right" class="w-4 h-4"></i></button>`}
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+ 
+        container.appendChild(section);
+      });
+ 
+      lucide.createIcons();
+    }
+    
+     let expandedEvent = null;
+     let selectedEvent = null;
+     let currentFilter = 'all';
+     let searchQuery = '';
+ 
+     // Utility functions
+     function formatDate(dateStr) {
+       if (!dateStr) return 'Date TBA';
+       const date = new Date(dateStr);
+       return isNaN(date.getTime()) ? dateStr : date.toLocaleDateString('en-US', { 
+         year: 'numeric', 
+         month: 'short', 
+         day: 'numeric' 
+       });
+     }
+ 
+     function getCategoryById(id) {
+       return categories.find(cat => cat.id === id);
+     }
+ 
+     function getAvailabilityStatus(current = 0, max = 0) {
+       if (max === 0) return { text: 'Open', className: 'available' };
+       const percentage = (current / max) * 100;
+       if (percentage >= 90) return { text: 'Almost Full', className: 'almost-full' };
+       if (percentage >= 70) return { text: 'Filling Fast', className: 'filling-fast' };
+       return { text: 'Available', className: 'available' };
+     }
+ 
+     // Toast notification
+     function showToast(message, type = 'success') {
+       const toast = document.getElementById('toast');
+       const toastMessage = document.getElementById('toast-message');
+       
+       toastMessage.textContent = message;
+       toast.className = `toast ${type}`;
+       toast.classList.add('show');
+       
+       // Update icon based on type
+       const icon = toast.querySelector('i');
+       if (type === 'success') {
+         icon.setAttribute('data-lucide', 'check-circle');
+         icon.className = 'w-6 h-6 text-green-500';
+       } else {
+         icon.setAttribute('data-lucide', 'x-circle');
+         icon.className = 'w-6 h-6 text-red-500';
+       }
+       lucide.createIcons();
+       
+       // Hide after 3 seconds
+       setTimeout(() => {
+         toast.classList.remove('show');
+       }, 3000);
+     }
+ 
+     // Tab management
+     function showTab(tab) {
+       // Update tab buttons
+       
+       register_container.classList.add('hidden');
+       document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+       document.getElementById(`tab-${tab}`).classList.add('active');
+       about_container.classList.remove('hidden');
+       // Update tab content
+       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+       document.getElementById(`content-${tab}`).classList.add('active');
+ 
+       if (tab === 'register') {
+         // Fetch latest events from the server before rendering
+         fetchEvents();
+       }
+     }
+ 
+     // User menu
+     function toggleUserMenu() {
+       const dropdown = document.getElementById('user-dropdown');
+       dropdown.classList.toggle('show');
+     }
+ 
+     function logout() {
+       alert('Logging out...');
+     }
+ 
+     // Close user menu when clicking outside
+     document.addEventListener('click', (e) => {
+       if (!e.target.closest('.user-menu')) {
+         document.getElementById('user-dropdown').classList.remove('show');
+       }
+     });
+ 
+     // FAQ toggle
+     function toggleFaq(element) {
+       const answer = element.nextElementSibling;
+       const icon = element.querySelector('i');
+       
+       if (answer.style.maxHeight) {
+         answer.style.maxHeight = null;
+         icon.style.transform = 'rotate(0deg)';
+       } else {
+         answer.style.maxHeight = answer.scrollHeight + 'px';
+         icon.style.transform = 'rotate(180deg)';
+       }
+     }
+ 
+     // Event management
+     function toggleEventExpansion(eventId) {
+       const eventCard = document.getElementById(`event-${eventId}`);
+       
+       if (expandedEvent === eventId) {
+         eventCard.classList.remove('expanded');
+         expandedEvent = null;
+       } else {
+         // Close previously expanded event
+         if (expandedEvent) {
+           document.getElementById(`event-${expandedEvent}`).classList.remove('expanded');
+         }
+         
+         eventCard.classList.add('expanded');
+         expandedEvent = eventId;
+       }
+     }
+ 
+     // Utility: generate UUID v4 (36 chars). Uses crypto.randomUUID when available.
+     function generateUUID() {
+       if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+       // fallback
+       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+         const r = Math.random() * 16 | 0;
+         const v = c === 'x' ? r : (r & 0x3 | 0x8);
+         return v.toString(16);
+       });
+     }
+ 
+     // Collect and validate registration form according to schema:
+     // reg_id char(36), event_id int, name varchar(300), school varchar(300),
+     // DOB date, grade varchar(50), contact_details char(50)
+     function collectAndValidateRegistration(formElement) {
+       const fd = new FormData(formElement);
+       const errors = [];
+ 
+       const values = {
+         // prefer a reg_id provided by the form (we populate it when opening modal)
+         reg_id: (fd.get('reg_id') || '').toString().trim() || generateUUID(), // char(36)
+         event_id: selectedEvent ? parseInt(selectedEvent.id, 10) : NaN,
+         name: (fd.get('name') || '').toString().trim(),
+         email: (fd.get('email') || '').toString().trim(), // extra, not in schema but kept
+         school: (fd.get('school') || '').toString().trim(),
+         DOB: (fd.get('dob') || '').toString().trim(),
+         grade: (fd.get('grade') || '').toString().trim(),
+         contact_details: (fd.get('contact_details') || '').toString().trim()
+       };
+ 
+       // validation rules
+       // event_id must be integer
+       if (!Number.isInteger(values.event_id)) errors.push('Invalid event id.');
+ 
+       // name and school: required, max 300
+       if (!values.name) errors.push('Name is required.');
+       else if (values.name.length > 300) errors.push('Name must be <= 300 chars.');
+ 
+       if (!values.school) errors.push('School is required.');
+       else if (values.school.length > 300) errors.push('School must be <= 300 chars.');
+ 
+       // DOB: required and valid date (YYYY-MM-DD). convert to ISO date string for storage
+       if (!values.DOB) {
+         errors.push('Date of Birth is required.');
+       } else {
+         const isoMatch = values.DOB.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+         const d = new Date(values.DOB);
+         if (!isoMatch || isNaN(d.getTime())) {
+           errors.push('Date of Birth must be a valid date (YYYY-MM-DD).');
+         } else {
+           values.DOB = d.toISOString().slice(0, 10);
+         }
+       }
+ 
+       // grade: required, max 50
+       if (!values.grade) errors.push('Grade is required.');
+       else if (values.grade.length > 50) errors.push('Grade must be <= 50 chars.');
+ 
+       // contact_details: required, max 50
+       if (!values.contact_details) errors.push('Contact details are required.');
+       else if (values.contact_details.length > 50) errors.push('Contact details must be <= 50 chars.');
+ 
+       // email: optional but validate length and basic format if present
+       if (values.email) {
+         if (values.email.length > 300) errors.push('Email must be <= 300 chars.');
+         else {
+           const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+           if (!emailRe.test(values.email)) errors.push('Email format is invalid.');
+         }
+       }
+ 
+       return {
+         valid: errors.length === 0,
+         errors,
+         values
+       };
+     }
 
-      container.appendChild(categorySection);
-});
+    // Open registration modal and populate reg_id + selectedEvent
+    function openRegistrationModal(eventId) {
+      // find event (allow numeric/string id)
+      selectedEvent = events.find(e => String(e.id) === String(eventId)) || null;
+      if (!selectedEvent) return;
 
-  
-        // Re-initialize Lucide icons for newly created elements
-        lucide.createIcons();
-      }, 800); // Simulated loading delay
+      const modal = document.getElementById('registration-modal');
+      if (!modal) return;
+
+      // populate event name and a reg_id by default
+      const nameEl = document.getElementById('modal-event-name');
+      if (nameEl) nameEl.textContent = selectedEvent.name || '';
+
+      const rid = generateUUID();
+      const ridInput = document.getElementById('reg-id');
+      if (ridInput) ridInput.value = rid;
+
+      // open modal
+      modal.classList.add('show');
+    }
+
+    // Close registration modal and reset form (keeps page stable)
+    function closeModal() {
+      const modal = document.getElementById('registration-modal');
+      if (!modal) return;
+      modal.classList.remove('show');
+      const form = document.getElementById('registration-form');
+      if (form) form.reset();
+      const ridInput = document.getElementById('reg-id');
+      if (ridInput) ridInput.value = '';
+      selectedEvent = null;
+    }
+
+    // Close the result modal
+    function closeResultModal() {
+      const modal = document.getElementById('result-modal');
+      if (!modal) return;
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
     }
 
     // Initialize the page
-    document.addEventListener('DOMContentLoaded', () => {
+     document.addEventListener('DOMContentLoaded', () => {
+      loadRegisteredFromCookie();
       showTab('about');
-      
-      // Initialize FAQ items
-      document.querySelectorAll('.faq-answer').forEach(answer => {
-        answer.style.maxHeight = null;
-      });
-    });
+       
+       // Initialize FAQ items
+       document.querySelectorAll('.faq-answer').forEach(answer => {
+         answer.style.maxHeight = null;
+       });
+     });
   </script>
 </body>
 </html>
