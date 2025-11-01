@@ -709,10 +709,7 @@
   <!-- Header -->
   <header class="p-4 flex justify-between items-center">
     <div class="flex items-center">
-      <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-lg">
-        <i data-lucide="calendar" class="w-6 h-6 text-orange-600"></i>
-      </div>
-      <h1 class="ml-3 text-2xl font-bold text-white">Zync</h1>
+      <img src="/static/zync-logo.png" alt="Zync" class="h-16" />
     </div>
     
     <!-- Navigation -->
@@ -747,36 +744,38 @@
       
       <!-- About Tab -->
       <div id="content-about" class="tab-content about active">
-        <div class="mb-8">
-          <h2 class="text-3xl font-bold text-gray-800 mb-2">Volksfiesta</h2>
-          <p class="text-gray-600">Learn more about Volksfiesta</p>
+        <div class="mb-8 text-center">
+          <div class="flex items-center justify-center mb-4">
+            <img src="/static/zync-logo.png" alt="Zync" class="h-32" />
+          </div>
+          <p class="text-xl text-gray-600">Event Management Platform</p>
         </div>
         
         <div class="max-w-4xl mx-auto space-y-8">
-          <!-- Event Logo Placeholder -->
-          <div class="text-center">
-            <div class="logo-placeholder">
-              <div class="logo-container">
-                <div class="text-center">
-                  <i data-lucide="calendar" class="w-16 h-16 text-orange-400 mx-auto mb-3"></i>
-                  <p class="text-orange-600 font-semibold text-lg">Event Logo</p>
-                  <p class="text-orange-500 text-sm">Coming Soon</p>
-                </div>
+          <!-- What We Do Section -->
+          <div class="info-card">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="p-2 rounded-xl bg-orange-50 border-2 border-orange-200">
+                <i data-lucide="zap" class="w-6 h-6 text-orange-600"></i>
               </div>
+              <h3 class="text-2xl font-bold text-gray-800">What We Do</h3>
             </div>
+            <p class="text-gray-700 leading-relaxed text-lg">
+              Zync empowers organizations to create, manage, and track events with ease. We enable you to organize student events, competitions, workshops, and registrations all in one unified platform. Whether you're coordinating cultural events or sports competitions, Zync streamlines the entire event lifecycle from creation to participant management.
+            </p>
           </div>
 
-          <!-- About Content -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Features Section -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="info-card">
               <div class="flex items-center gap-3 mb-4">
                 <div class="p-2 rounded-xl bg-blue-50 border-2 border-blue-200">
-                  <i data-lucide="users" class="w-6 h-6 text-blue-600"></i>
+                  <i data-lucide="sliders" class="w-6 h-6 text-blue-600"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-800">About Volksfiesta</h3>
+                <h3 class="text-xl font-bold text-gray-800">Custom Workflows</h3>
               </div>
-              <p class="text-gray-600 leading-relaxed">
-                **Type summary here**
+              <p class="text-gray-700 leading-relaxed">
+                Customize your event management workflow with flexible API endpoints. Integrate seamlessly with tools like Slack for notifications, email services for automated communications, and other third-party platforms to match your organization's unique needs.
               </p>
             </div>
 
@@ -788,185 +787,45 @@
                 <h3 class="text-xl font-bold text-gray-800">Event Categories</h3>
               </div>
               <div class="space-y-3">
+                <p class="text-gray-700 mb-3">Organize events into two main categories:</p>
                 <div class="flex items-center gap-3">
                   <div class="p-1.5 rounded-lg bg-purple-50 border border-purple-200">
                     <i data-lucide="palette" class="w-4 h-4 text-purple-600"></i>
                   </div>
-                  <span class="font-medium text-gray-700">Cultural</span>
+                  <span class="font-medium text-gray-700">Cultural Events</span>
                 </div>
                 <div class="flex items-center gap-3">
                   <div class="p-1.5 rounded-lg bg-green-50 border border-green-200">
                     <i data-lucide="trophy" class="w-4 h-4 text-green-600"></i>
                   </div>
-                  <span class="font-medium text-gray-700">Sports</span>
+                  <span class="font-medium text-gray-700">Sports Events</span>
                 </div>
               </div>
             </div>
 
             <div class="info-card">
               <div class="flex items-center gap-3 mb-4">
-                <div class="p-2 rounded-xl bg-purple-50 border-2 border-purple-200">
-                  <i data-lucide="calendar" class="w-6 h-6 text-purple-600"></i>
+                <div class="p-2 rounded-xl bg-indigo-50 border-2 border-indigo-200">
+                  <i data-lucide="users-check" class="w-6 h-6 text-indigo-600"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-800">How It Works</h3>
+                <h3 class="text-xl font-bold text-gray-800">Registration Management</h3>
               </div>
-              <div class="space-y-3 text-gray-600">
-                <div class="flex items-start gap-3">
-                  <div class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">1</div>
-                  <p>Browse events by category</p>
-                </div>
-                <div class="flex items-start gap-3">
-                  <div class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">2</div>
-                  <p>Click "Register Now" for events you're interested in</p>
-                </div>
-                <div class="flex items-start gap-3">
-                  <div class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">3</div>
-                  <p>Receive confirmation and event details</p>
-                </div>
-              </div>
+              <p class="text-gray-700 leading-relaxed">
+                Track participant registrations in real-time. Collect essential information, manage attendee lists, and maintain detailed records of all event participants with our streamlined registration system.
+              </p>
             </div>
 
             <div class="info-card">
               <div class="flex items-center gap-3 mb-4">
-                <div class="p-2 rounded-xl bg-red-50 border-2 border-red-200">
-                  <i data-lucide="map-pin" class="w-6 h-6 text-red-600"></i>
+                <div class="p-2 rounded-xl bg-pink-50 border-2 border-pink-200">
+                  <i data-lucide="code" class="w-6 h-6 text-pink-600"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-800">Contact & Support</h3>
+                <h3 class="text-xl font-bold text-gray-800">API Integration</h3>
               </div>
-              <div class="space-y-2 text-gray-600">
-                <p>Need help with registration?</p>
-                <p class="font-semibold text-orange-600">support@zync.school</p>
-                <p class="text-sm">We're here to help you make the most of your event experience!</p>
-              </div>
+              <p class="text-gray-700 leading-relaxed">
+                Leverage our powerful REST API to build custom integrations. Connect with Slack for event notifications, email providers for automated communications, and other tools to create a fully integrated event management ecosystem.
+              </p>
             </div>
-          </div>
-
-          <!-- FAQ Section -->
-          <div class="info-card">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Frequently Asked Questions</h3>
-            <div class="faq-list">
-              <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                  How do I register for an event?
-                  <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i>
-                </div>
-                <div class="faq-answer">
-                  Simply navigate to the "Register Now" tab, browse through the available events, and click on the "Register Now" button for any event you're interested in. Fill out the registration form with your details and submit.
-                </div>
-              </div>
-              <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                  Can I cancel my registration?
-                  <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i>
-                </div>
-                <div class="faq-answer">
-                  Yes, you can cancel your registration up to 48 hours before the event starts. Please contact our support team at support@zync.school to request a cancellation.
-                </div>
-              </div>
-              <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                  Is there a registration fee?
-                  <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i>
-                </div>
-                <div class="faq-answer">
-                  Most events are free for students. However, some special workshops or competitions may have a nominal fee which will be clearly mentioned in the event details.
-                </div>
-              </div>
-              <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                  How will I receive event updates?
-                  <i data-lucide="chevron-down" class="w-5 h-5 text-gray-400"></i>
-                </div>
-                <div class="faq-answer">
-                  After registration, you'll receive a confirmation email with event details. We'll also send reminders and updates via email as the event approaches.
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Organizer Contact Information -->
-          <div class="info-card">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Event Organizers</h3>
-            <div class="contact-info">
-              <div class="contact-card">
-                <div class="flex items-center gap-3 mb-3">
-                  <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                    <i data-lucide="user" class="w-5 h-5 text-orange-600"></i>
-                  </div>
-                  <div>
-                    <h4 class="font-semibold text-gray-800">Sarah Johnson</h4>
-                    <p class="text-sm text-gray-600">Cultural Events Coordinator</p>
-                  </div>
-                </div>
-                <div class="space-y-1 text-sm">
-                  <div class="flex items-center gap-2 text-gray-600">
-                    <i data-lucide="mail" class="w-4 h-4"></i>
-                    <span>sarah@zync.school</span>
-                  </div>
-                  <div class="flex items-center gap-2 text-gray-600">
-                    <i data-lucide="phone" class="w-4 h-4"></i>
-                    <span>+1 (555) 123-4567</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="contact-card">
-                <div class="flex items-center gap-3 mb-3">
-                  <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <i data-lucide="user" class="w-5 h-5 text-green-600"></i>
-                  </div>
-                  <div>
-                    <h4 class="font-semibold text-gray-800">Michael Chen</h4>
-                    <p class="text-sm text-gray-600">Tech Events Manager</p>
-                  </div>
-                </div>
-                <div class="space-y-1 text-sm">
-                  <div class="flex items-center gap-2 text-gray-600">
-                    <i data-lucide="mail" class="w-4 h-4"></i>
-                    <span>michael@zync.school</span>
-                  </div>
-                  <div class="flex items-center gap-2 text-gray-600">
-                    <i data-lucide="phone" class="w-4 h-4"></i>
-                    <span>+1 (555) 987-6543</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="contact-card">
-                <div class="flex items-center gap-3 mb-3">
-                  <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <i data-lucide="user" class="w-5 h-5 text-blue-600"></i>
-                  </div>
-                  <div>
-                    <h4 class="font-semibold text-gray-800">Emily Rodriguez</h4>
-                    <p class="text-sm text-gray-600">Sports Events Director</p>
-                  </div>
-                </div>
-                <div class="space-y-1 text-sm">
-                  <div class="flex items-center gap-2 text-gray-600">
-                    <i data-lucide="mail" class="w-4 h-4"></i>
-                    <span>emily@zync.school</span>
-                  </div>
-                  <div class="flex items-center gap-2 text-gray-600">
-                    <i data-lucide="phone" class="w-4 h-4"></i>
-                    <span>+1 (555) 456-7890</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Call to Action -->
-          <div class="cta-section">
-            <h3 class="text-2xl font-bold mb-3">Ready to Get Started?</h3>
-            <p class="mb-6 text-orange-100">Join exciting events and connect with your school community</p>
-            <button class="cta-button" onclick="showTab('register')">
-              Start Registering
-              <i data-lucide="chevron-right" class="w-4 h-4"></i>
-            </button>
-            
-            <!-- Social Sharing -->
-            
           </div>
         </div>
       </div>
