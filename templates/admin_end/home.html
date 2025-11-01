@@ -432,9 +432,29 @@
       }
     });
 
-    // Modified logout functionality to redirect to login.html
-    logoutDropdown.addEventListener('click', () => {
-      window.location.href = 'signup.html';
+    // Clear cookies, storage and redirect to /login when logout clicked
+    function clearAllCookies() {
+      document.cookie.split(";").forEach(cookie => {
+        const eqPos = cookie.indexOf("=");
+        const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+        // expire cookie for current domain/path
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${location.hostname};`;
+        // expire cookie fallback without domain
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;`;
+      });
+    }
+
+    function logoutAndRedirect() {
+      try { clearAllCookies(); } catch (e) { /* ignore */ }
+      try { localStorage.clear(); sessionStorage.clear(); } catch (e) { /* ignore */ }
+      // redirect to login route
+      window.location.href = 'admin/login';
+    }
+
+    logoutDropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+      logoutDropdown.classList.remove('show');
+      logoutAndRedirect();
     });
     
     // --- Global State ---
@@ -530,7 +550,10 @@
             <div id="info-view-${eventObj.id}">
               <p class="font-bold text-orange-600 mb-1">Description:</p>
               <p class="text-gray-700 mb-4">${eventObj.description || 'No description provided.'}</p>
-              <button class="edit-btn bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 font-semibold transition">Edit Event</button>
+              <div class="flex items-center gap-2">
+                <button class="edit-btn bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 font-semibold transition">Edit Event</button>
+                <button class="view-btn bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 font-semibold transition">View Registrations</button>
+              </div>
             </div>
             <div id="form-view-${eventObj.id}" style="display: none;">
                 <form class="edit-form">
@@ -568,6 +591,15 @@
             saveEventChanges(eventObj.id);
         };
 
+        // redirect to registrations page for this event
+        const viewBtn = dropdown.querySelector('.view-btn');
+        if (viewBtn) {
+          viewBtn.onclick = (ev) => {
+            ev.stopPropagation();
+            window.location.href = `/admin/dashboard/registration/${encodeURIComponent(eventObj.id)}`;
+          };
+        }
+        
         eventDiv.appendChild(dropdown);
         return eventDiv;
     }
@@ -707,7 +739,7 @@
       }
     }
 
-    function saveEventChanges(eventId) {
+    async function saveEventChanges(eventId) {
         const form = document.querySelector(`#form-view-${eventId} form`);
         const newName = form.elements.name.value.trim();
         const newDate = form.elements.date.value;
@@ -720,12 +752,67 @@
             return;
         }
         
-        const eventIndex = events.findIndex(e => e.id === eventId);
-        if (eventIndex === -1) return;
+        try {
+            // Get auth-key from cookies
+            const authKey = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('auth-key='))
+                ?.split('=')[1] || '';
 
-        events[eventIndex] = { ...events[eventIndex], name: newName, date: newDate, venue: newVenue, description: newDescription, type: newType };
-        showCustomAlert('Success', 'Event updated successfully.');
-        renderManageEvents(); 
+            if (!authKey) {
+                showCustomAlert('Error', 'You are not authenticated. Please login again.');
+                return;
+            }
+
+            // Prepare request body matching the edit_event_api.py format
+            const editData = {
+                event_id: eventId,
+                type: newType,
+                name: newName,
+                description: newDescription,
+                date: newDate,
+                venue: newVenue,
+                auth_key: authKey
+            };
+
+            const response = await fetch('/admin/api/event/edit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(editData),
+                credentials: 'include'
+            });
+
+            let data = null;
+            try { 
+                data = await response.json(); 
+            } catch (e) { 
+                console.error('Failed to parse response:', e);
+            }
+
+            if (response.ok && data && data.code === 200) {
+                // Update local events array
+                const eventIndex = events.findIndex(e => e.id === eventId);
+                if (eventIndex !== -1) {
+                    events[eventIndex] = { 
+                        ...events[eventIndex], 
+                        name: newName, 
+                        date: newDate, 
+                        venue: newVenue, 
+                        description: newDescription, 
+                        type: newType 
+                    };
+                }
+                showCustomAlert('Success', data.message || 'Event updated successfully!');
+                renderManageEvents();
+                switchDropdownView(eventId, 'info');
+            } else {
+                const errorMsg = (data && data.message) || `Server error (${response.status})`;
+                showCustomAlert('Error', errorMsg);
+            }
+        } catch (error) {
+            console.error('Error updating event:', error);
+            showCustomAlert('Error', 'Network error. Please try again.');
+        }
     }
     
     // --- App Initialization ---

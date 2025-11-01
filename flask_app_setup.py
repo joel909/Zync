@@ -3,6 +3,7 @@ from flask import Flask
 from routes.page_routes.admin_end.dashboard_route import home_blueprint
 from routes.page_routes.admin_end.login_route import login_blueprint
 from routes.page_routes.admin_end.signup_route import signup_blueprint
+from routes.page_routes.admin_end.registration_route import registration_blueprint
 
 #User
 from routes.page_routes.user_end.home_route import user_home_blueprint
@@ -12,6 +13,8 @@ from routes.api.auth_api.sign_up_api import signup_api_obj
 from routes.api.event_api.create_event_api import create_event_api_obj
 from routes.api.event_api.display_events_api import display_event_api_obj
 from routes.api.event_api.register_for_event_api import register_for_event_api_obj
+from routes.api.event_api.edit_event_api import edit_event_api_obj
+from routes.api.event_api.get_registrations_api import get_registrations_api_obj
 
 from routes.middleware.auth import authenticate_user
 from flask import Blueprint, request, g,redirect,url_for    
@@ -37,6 +40,7 @@ def create_app():
     app.register_blueprint(home_blueprint,url_prefix='/admin')
     app.register_blueprint(login_blueprint,url_prefix='/admin')
     app.register_blueprint(signup_blueprint,url_prefix='/admin')
+    app.register_blueprint(registration_blueprint,url_prefix='/admin')
 
     #NORMAL USER END
     app.register_blueprint(user_home_blueprint)
@@ -54,6 +58,12 @@ def create_app():
 
     ##create event API
     app.register_blueprint(create_event_api_obj,url_prefix="/admin/api")
+
+    ##edit event API
+    app.register_blueprint(edit_event_api_obj,url_prefix="/admin/api")
+
+    ##get registrations API
+    app.register_blueprint(get_registrations_api_obj,url_prefix="/admin/api")
 
     ## register for event API
     app.register_blueprint(register_for_event_api_obj,url_prefix="/api")

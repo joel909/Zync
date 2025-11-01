@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Event Registrations</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    body {
+      margin: 0;
+    }
+
+    .loader-overlay {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(5px);
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .loader {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #f97316;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1.5s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .theme-bg {
+      background-image: linear-gradient(to bottom right, #facc15, #f97316, #ef4444);
+    }
+
+    .tab-button {
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      background-color: rgba(255 255 255 / 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 0.75rem;
+      padding: 0 1rem;
+      font-size: 1rem;
+      color: #333;
+      display: flex;
+      align-items: center;
+      user-select: none;
+      white-space: nowrap;
+      height: 2.25rem;
+      min-width: 110px;
+      justify-content: center;
+    }
+
+    .tab-button:hover {
+      background-color: #ffb866;
+      color: white;
+    }
+
+    .tab-active {
+      background-color: #ffb866 !important;
+      color: white !important;
+    }
+
+    #user-icon-btn {
+      width: 38px; height: 38px; border-radius: 0.75rem;
+      background-color: rgba(255 255 255 / 0.9);
+      display: flex; justify-content: center; align-items: center;
+      cursor: pointer; box-shadow: 0 1px 6px rgb(0 0 0 / 0.1);
+      transition: background-color 0.2s ease-in-out; position: relative;
+      min-width: 2.25rem; min-height: 2.25rem;
+    }
+    #user-icon-btn:hover { background-color: #ffb866; }
+    #user-icon-btn svg {
+      width: 22px; height: 22px; stroke: #f97316;
+      transition: stroke 0.2s ease-in-out;
+    }
+    #user-icon-btn:hover svg { stroke: white; }
+
+    #logout-dropdown {
+      position: absolute; top: 48px; right: 0;
+      background: white; border-radius: 0.5rem;
+      box-shadow: 0 4px 15px rgb(0 0 0 / 0.15);
+      padding: 0.5rem 1rem; font-weight: 600; color: #f97316;
+      cursor: pointer; white-space: nowrap; display: none;
+      user-select: none; min-width: 80px; z-index: 101;
+      transition: opacity 0.2s ease-in-out;
+    }
+    #logout-dropdown.show { display: block; }
+
+    #main-tabs-container {
+      position: fixed; top: 1rem; right: 1rem;
+      background: rgba(255 255 255 / 0.75);
+      backdrop-filter: blur(12px);
+      padding: 0.25rem 0.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 15px rgb(0 0 0 / 0.12);
+      display: flex; align-items: center; gap: 0.75rem;
+      z-index: 100; user-select: none; min-width: max-content;
+    }
+
+    /* Custom Alert Modal Styles */
+    .custom-alert-overlay {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 250;
+    }
+
+    .custom-alert-box {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+    }
+
+    .custom-alert-box h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #f97316;
+        margin-bottom: 1rem;
+    }
+
+    .custom-alert-box p {
+        color: #333;
+        margin-bottom: 1.5rem;
+    }
+
+    .custom-alert-box button {
+        background-color: #f97316;
+        color: white;
+        font-weight: 600;
+        padding: 0.5rem 1.5rem;
+        border-radius: 0.5rem;
+        border: none;
+        cursor: pointer;
+    }
+
+    .registration-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.75rem;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .registration-table thead {
+      background-color: #f97316;
+      color: white;
+    }
+
+    .registration-table th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .registration-table td {
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 0.95rem;
+    }
+
+    .registration-table tbody tr:hover {
+      background-color: #fff6eb;
+    }
+
+    .registration-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .no-registrations {
+      text-align: center;
+      padding: 1.5rem;
+      color: #666;
+      font-weight: 500;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen theme-bg font-sans text-gray-800 transition-colors duration-300">
+  <div id="loader-overlay" class="loader-overlay">
+    <div class="loader"></div>
+  </div>
+
+  <!-- Custom Alert Modal HTML -->
+  <div id="custom-alert-overlay" class="custom-alert-overlay">
+    <div class="custom-alert-box">
+      <h3 id="custom-alert-title"></h3>
+      <p id="custom-alert-message"></p>
+      <button onclick="hideCustomAlert()">OK</button>
+    </div>
+  </div>
+
+  <header class="p-4 flex justify-between items-center">
+    <div class="flex items-center">
+      <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-lg">
+        <i data-lucide="calendar" class="w-6 h-6 text-orange-600"></i>
+      </div>
+      <h1 class="ml-3 text-2xl font-bold text-white">Zync</h1>
+    </div>
+    <div id="main-tabs-container">
+      <button id="btn-back" onclick="goBack()" class="tab-button">← Back</button>
+      <div id="user-icon-btn" tabindex="0" title="User menu">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <div id="logout-dropdown">Logout</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="pt-16 px-4 md:px-6 pb-8">
+    <div class="max-w-5xl mx-auto bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow transition-all">
+      <div class="mb-3" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
+        <h2 class="text-xl font-bold text-orange-600" style="text-align: center; width: 100%;">Registrations for Event</h2>
+        <p id="event-name" class="text-gray-600 text-sm mt-1" style="text-align: center; width: 100%;">Loading event details...</p>
+      </div>
+
+      <div id="registrations-container" style="width: 100%;">
+        <table class="registration-table">
+          <thead>
+            <tr>
+              <th>Reg ID</th>
+              <th>Participant Name</th>
+              <th>School</th>
+              <th>Date of Birth</th>
+              <th>Grade</th>
+              <th>Contact Details</th>
+              <th>Registered At</th>
+            </tr>
+          </thead>
+          <tbody id="registrations-tbody">
+            <tr>
+              <td colspan="7" class="no-registrations">Loading registrations...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer class="text-center text-sm text-white mt-12 p-4">
+    © 2025 All rights reserved.
+  </footer>
+
+  <script>
+    const userIconBtn = document.getElementById('user-icon-btn');
+    const logoutDropdown = document.getElementById('logout-dropdown');
+    
+    // --- Custom Alert Modal Functions ---
+    const customAlertOverlay = document.getElementById('custom-alert-overlay');
+    const customAlertTitle = document.getElementById('custom-alert-title');
+    const customAlertMessage = document.getElementById('custom-alert-message');
+
+    function showCustomAlert(title, message) {
+        customAlertTitle.textContent = title;
+        customAlertMessage.textContent = message;
+        customAlertOverlay.style.display = 'flex';
+    }
+
+    function hideCustomAlert() {
+        customAlertOverlay.style.display = 'none';
+    }
+
+    userIconBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      logoutDropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', () => {
+      logoutDropdown.classList.remove('show');
+    });
+
+    userIconBtn.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        userIconBtn.click();
+      } else if (e.key === 'Escape') {
+        logoutDropdown.classList.remove('show');
+      }
+    });
+
+    // Clear cookies, storage and redirect to /login when logout clicked
+    function clearAllCookies() {
+      document.cookie.split(";").forEach(cookie => {
+        const eqPos = cookie.indexOf("=");
+        const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${location.hostname};`;
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;`;
+      });
+    }
+
+    function logoutAndRedirect() {
+      try { clearAllCookies(); } catch (e) { /* ignore */ }
+      try { localStorage.clear(); sessionStorage.clear(); } catch (e) { /* ignore */ }
+      window.location.href = '/admin/login';
+    }
+
+    logoutDropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+      logoutDropdown.classList.remove('show');
+      logoutAndRedirect();
+    });
+
+    // Go back to dashboard
+    function goBack() {
+      window.location.href = '/admin/dashboard';
+    }
+
+    // --- Extract Event ID from URL ---
+    function getEventIdFromURL() {
+      const pathParts = window.location.pathname.split('/');
+      return pathParts[pathParts.length - 1];
+    }
+
+    // --- Fetch Registrations ---
+    async function fetchRegistrations() {
+      const eventId = getEventIdFromURL();
+      const loader = document.getElementById('loader-overlay');
+      
+      try {
+        // Get auth-key from cookies
+        const authKey = document.cookie
+          .split('; ')
+          .find(row => row.startsWith('auth-key='))
+          ?.split('=')[1] || '';
+
+        if (!authKey) {
+          showCustomAlert('Error', 'You are not authenticated. Please login again.');
+          loader.style.display = 'none';
+          return;
+        }
+
+        // Make API request
+        const response = await fetch(`/admin/api/event/registrations/get?event_id=${encodeURIComponent(eventId)}`, {
+          method: 'GET',
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-Auth-Key': authKey
+          },
+          credentials: 'include'
+        });
+
+        let data = null;
+        try {
+          data = await response.json();
+        } catch (e) {
+          console.error('Failed to parse response:', e);
+        }
+
+        if (response.ok && data) {
+          populateRegistrations(data);
+        } else {
+          const errorMsg = (data && data.message) || `Server error (${response.status})`;
+          showCustomAlert('Error', errorMsg);
+        }
+      } catch (error) {
+        console.error('Error fetching registrations:', error);
+        showCustomAlert('Error', 'Network error. Please try again.');
+      } finally {
+        loader.style.display = 'none';
+      }
+    }
+
+    // --- Populate Registrations Table ---
+    function populateRegistrations(data) {
+      const tbody = document.getElementById('registrations-tbody');
+      const eventNameEl = document.getElementById('event-name');
+      
+      // Set event name if available
+      if (data.event_name) {
+        eventNameEl.textContent = `${data.event_name}`;
+      }
+
+      const registrations = data.registrations || data.data || [];
+
+      if (!Array.isArray(registrations) || registrations.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="no-registrations">No registrations found for this event.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = registrations.map(reg => `
+        <tr>
+          <td>${reg.id || reg.reg_id || 'N/A'}</td>
+          <td>${reg.name || 'N/A'}</td>
+          <td>${reg.school || 'N/A'}</td>
+          <td>${reg.DOB || reg.dob || 'N/A'}</td>
+          <td>${reg.grade || 'N/A'}</td>
+          <td>${reg.contact_details || reg.contactDetails || 'N/A'}</td>
+          <td>${reg.registered_at || reg.registeredAt || 'N/A'}</td>
+        </tr>
+      `).join('');
+    }
+
+    // --- App Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      fetchRegistrations();
+    });
+  </script>
+</body>
+</html>

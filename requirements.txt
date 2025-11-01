@@ -1,0 +1,7 @@
+Flask
+mysql-connector
+dotenv
+
+# Optional: if you later need specific versions, replace the lines above with pins, e.g.
+# Flask==2.2.5
+# mysql-connector-python==8.0.34

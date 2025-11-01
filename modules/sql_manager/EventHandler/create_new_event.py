@@ -2,7 +2,7 @@ def create_new_event(self, core_event, event_name, description, ev_date, venue, 
     try:
         # Use parameterized query to prevent SQL injection
         query = """
-            INSERT INTO events (core_event, event_name, description, ev_date, venue, auth_key)
+            INSERT INTO events (core_event, event_name, description, ev_date, venue, created_by_auth_key)
             VALUES (%s, %s, %s, %s, %s, %s);
         """
         self.cursor.execute(query, (core_event, event_name, description, ev_date, venue, auth_key))

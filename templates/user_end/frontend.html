@@ -1047,22 +1047,6 @@
           </div>
           
           <div>
-            <label for="student-email" class="form-label">
-              <span>Email Address</span>
-              <span class="required-indicator">*</span>
-            </label>
-            <input
-              type="email"
-              id="student-email"
-              name="email"
-              required
-              class="form-input"
-              placeholder="Enter your email address"
-              maxlength="300"
-            />
-          </div>
-          
-          <div>
             <label for="student-school" class="form-label">
               <span>School</span>
               <span class="required-indicator">*</span>
@@ -1510,69 +1494,57 @@
      // Collect and validate registration form according to schema:
      // reg_id char(36), event_id int, name varchar(300), school varchar(300),
      // DOB date, grade varchar(50), contact_details char(50)
-     function collectAndValidateRegistration(formElement) {
-       const fd = new FormData(formElement);
-       const errors = [];
- 
-       const values = {
-         // prefer a reg_id provided by the form (we populate it when opening modal)
-         reg_id: (fd.get('reg_id') || '').toString().trim() || generateUUID(), // char(36)
-         event_id: selectedEvent ? parseInt(selectedEvent.id, 10) : NaN,
-         name: (fd.get('name') || '').toString().trim(),
-         email: (fd.get('email') || '').toString().trim(), // extra, not in schema but kept
-         school: (fd.get('school') || '').toString().trim(),
-         DOB: (fd.get('dob') || '').toString().trim(),
-         grade: (fd.get('grade') || '').toString().trim(),
-         contact_details: (fd.get('contact_details') || '').toString().trim()
-       };
- 
-       // validation rules
-       // event_id must be integer
-       if (!Number.isInteger(values.event_id)) errors.push('Invalid event id.');
- 
-       // name and school: required, max 300
-       if (!values.name) errors.push('Name is required.');
-       else if (values.name.length > 300) errors.push('Name must be <= 300 chars.');
- 
-       if (!values.school) errors.push('School is required.');
-       else if (values.school.length > 300) errors.push('School must be <= 300 chars.');
- 
-       // DOB: required and valid date (YYYY-MM-DD). convert to ISO date string for storage
-       if (!values.DOB) {
-         errors.push('Date of Birth is required.');
-       } else {
-         const isoMatch = values.DOB.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-         const d = new Date(values.DOB);
-         if (!isoMatch || isNaN(d.getTime())) {
-           errors.push('Date of Birth must be a valid date (YYYY-MM-DD).');
-         } else {
-           values.DOB = d.toISOString().slice(0, 10);
-         }
-       }
- 
-       // grade: required, max 50
-       if (!values.grade) errors.push('Grade is required.');
-       else if (values.grade.length > 50) errors.push('Grade must be <= 50 chars.');
- 
-       // contact_details: required, max 50
-       if (!values.contact_details) errors.push('Contact details are required.');
-       else if (values.contact_details.length > 50) errors.push('Contact details must be <= 50 chars.');
- 
-       // email: optional but validate length and basic format if present
-       if (values.email) {
-         if (values.email.length > 300) errors.push('Email must be <= 300 chars.');
-         else {
-           const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-           if (!emailRe.test(values.email)) errors.push('Email format is invalid.');
-         }
-       }
- 
-       return {
-         valid: errors.length === 0,
-         errors,
-         values
-       };
-     }
+    function collectAndValidateRegistration(formElement) {
+      const fd = new FormData(formElement);
+      const errors = [];
+
+      const values = {
+        reg_id: (fd.get('reg_id') || '').toString().trim() || generateUUID(),
+        event_id: selectedEvent ? parseInt(selectedEvent.id, 10) : NaN,
+        user_name: (fd.get('name') || '').toString().trim(),
+        user_school: (fd.get('school') || '').toString().trim(),
+        user_dob: (fd.get('dob') || '').toString().trim(),
+        user_grade: (fd.get('grade') || '').toString().trim(),
+        user_contact_details: (fd.get('contact_details') || '').toString().trim()
+      };
+
+      // event_id must be integer
+      if (!Number.isInteger(values.event_id)) errors.push('Invalid event id.');
+
+      // name and school: required, max 300
+      if (!values.user_name) errors.push('Name is required.');
+      else if (values.user_name.length > 300) errors.push('Name must be <= 300 chars.');
+
+      if (!values.user_school) errors.push('School is required.');
+      else if (values.user_school.length > 300) errors.push('School must be <= 300 chars.');
+
+      // DOB: required and valid date (YYYY-MM-DD). convert to ISO date string for storage
+      if (!values.user_dob) {
+        errors.push('Date of Birth is required.');
+      } else {
+        const isoMatch = values.user_dob.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        const d = new Date(values.user_dob);
+        if (!isoMatch || isNaN(d.getTime())) {
+          errors.push('Date of Birth must be a valid date (YYYY-MM-DD).');
+        } else {
+          values.user_dob = d.toISOString().slice(0, 10);
+        }
+      }
+
+      // grade: required, max 50
+      if (!values.user_grade) errors.push('Grade is required.');
+      else if (values.user_grade.length > 50) errors.push('Grade must be <= 50 chars.');
+
+      // user_contact_details: required, max 50
+      if (!values.user_contact_details) errors.push('Contact details are required.');
+      else if (values.user_contact_details.length > 50) errors.push('Contact details must be <= 50 chars.');
+
+      return {
+        valid: errors.length === 0,
+        errors,
+        values
+      };
+    }
 
     // Open registration modal and populate reg_id + selectedEvent
     function openRegistrationModal(eventId) {
@@ -1625,6 +1597,81 @@
          answer.style.maxHeight = null;
        });
      });
+
+    // --- Added: submit handler + result modal helper ---
+    function showResultModal(title, message, success = true) {
+      const modal = document.getElementById('result-modal');
+      const icon = document.getElementById('result-icon');
+      const titleEl = document.getElementById('result-title');
+      const msgEl = document.getElementById('result-message');
+      if (!modal || !icon || !titleEl || !msgEl) return;
+
+      titleEl.textContent = title || (success ? 'Success' : 'Error');
+      msgEl.textContent = message || '';
+
+      icon.className = success
+        ? 'w-16 h-16 rounded-full bg-green-100 text-green-600 flex items-center justify-center mx-auto mb-4'
+        : 'w-16 h-16 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-4';
+      icon.innerHTML = success ? '<i data-lucide="check-circle" class="w-8 h-8"></i>' : '<i data-lucide="x-circle" class="w-8 h-8"></i>';
+      lucide.createIcons();
+
+      modal.classList.add('show');
+      modal.removeAttribute('aria-hidden');
+    }
+
+    // Submit registration form -> POST to register route
+    document.getElementById('registration-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const submitBtn = document.getElementById('submit-button');
+      const { valid, errors, values } = collectAndValidateRegistration(form);
+
+      if (!valid) {
+        showResultModal('Validation error', errors.join('\n'), false);
+        return;
+      }
+
+      // small UI feedback
+      const previousBtnHtml = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="loading-spinner"></span> Registering...';
+
+      try {
+        // Adjust endpoint as needed; currently posts to relative admin register route
+        const resp = await fetch('/api/event/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(values)
+        });
+
+        let data = null;
+        try { data = await resp.json(); } catch (_) { /* ignore json parse errors */ }
+
+        if (resp.ok) {
+          // mark the event as registered in a cookie and update UI
+          const existing = readRegisteredCookie();
+          existing.push(String(values.event_id));
+          const unique = Array.from(new Set(existing));
+          document.cookie = `zync_registered=${encodeURIComponent(JSON.stringify(unique))}; path=/; max-age=${60 * 60 * 24 * 365}`;
+
+          loadRegisteredFromCookie();
+          renderEvents();
+
+          showResultModal('Registration successful', (data && data.message) || 'You are registered for the event.', true);
+        } else {
+          const msg = (data && (data.message || data.error)) || `Server error (${resp.status})`;
+          showResultModal('Registration failed', msg, false);
+        }
+      } catch (err) {
+        console.error('registration error', err);
+        showResultModal('Registration failed', 'Network error. Please try again.', false);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = previousBtnHtml;
+        form.reset();
+        closeModal();
+      }
+    });
   </script>
 </body>
 </html>

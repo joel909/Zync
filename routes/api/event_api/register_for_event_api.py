@@ -12,9 +12,11 @@ def fetch_events():
         school = request.get_json()["user_school"]
         grade = request.get_json()["user_grade"]
         dob = request.get_json()["user_dob"]
-        contact = request.get_json()["user_contact"]
+        # email = request.get_json()["user_email"]
+        contact = request.get_json()["user_contact_details"]
         with SqlManager().ClientEventHandler() as client_handler_object:
             all_events = client_handler_object.register_for_event(event_id,name,school,dob,grade,contact)
             return {"message":"fetched successfully","code":200,"data":all_events}
-    except:
-        return create_response(500,"Internal Server")
+    except Exception as e:
+        print("Error occured cuz of ",e)
+        return create_response("Internal Server Error",500)
